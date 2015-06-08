@@ -1,0 +1,52 @@
+[
+    // General form
+    [
+        // String command type. In compressed mode it is replaced with a number
+        "command",
+
+        // Entity attributes to route. Might be the payload in the same time
+        {},
+
+        // The rest of items are payload of the command
+        {},
+        "abc",
+        42,
+        true,
+        null
+    ],
+
+    // Add entity
+    [
+        "add",
+        {}, // All attributes
+        []  // Actions to the same object. Optional
+    ],
+
+    // Update entity
+    [
+        "update",
+        {}, // Minimal set of new attribute values + values of all updated attributes
+        {}, // Optional. Previous values of updated attributes.
+        []  // Actions to the same object. Optional
+    ],
+
+    // Remove entity
+    [
+        "remove",
+        {} // Minimal set of attributes
+    ],
+
+    // Execute the action on a client
+    [
+        "action",
+        {}, // Minimal set of object attributes to route affected objects
+        "actionName", // String action name
+
+        // The rest of items are the action arguments
+        {},
+        "abc",
+        42,
+        true,
+        null
+    ]
+]

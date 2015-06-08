@@ -1,0 +1,47 @@
+{
+    // Section to define profiles
+    "profiles": {
+
+        // Profile
+        "profileName": {
+
+            // Binding of profile
+            "bindingName": {
+
+                // ** Filter parameters **
+
+                // Match pattern, optional
+
+                // Base form
+                "match": {
+                    "category": "category",          // Model attribute name -> Request parameter name
+                    "category": "anotherBinding.id"  // Model (detail) attribute name -> Master model attribute reference
+                },
+
+                // Short form
+                "match": [
+                    "category"
+                ],
+
+                // Constant matching
+                "matchConst": {
+                    "category": "n",        // Model attribute name -> Constant
+                    "category": ["m", "n"]  // Model attribute name -> Set of constants
+                },
+
+                // JS filter, optional
+                "where": "model.subject >= {filter}",
+
+                // SQL filter, optional (JS filter could be converted into SQL in most cases)
+                "whereSql": "model.subject >= {filter}",
+
+                // Channel name shortening, optional
+                "channelTemplate": "ccc={category}",
+
+
+                // Server model id
+                "serverModel": "app\\modules\\cometSample\\models\\DemoRow"
+            }
+        }
+    }
+}

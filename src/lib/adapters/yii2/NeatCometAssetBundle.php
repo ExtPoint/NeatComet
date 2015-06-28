@@ -12,6 +12,7 @@ class NeatCometAssetBundle extends AssetBundle {
         'Exception.js',
         'NeatCometClient.js',
         'SafeChannelClient.js',
+        'SimpleCollectionMapperClient.js',
     ];
 
     /**

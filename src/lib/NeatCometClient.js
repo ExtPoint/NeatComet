@@ -30,6 +30,16 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, {
     /** @type {number} */
     _lastId: 0,
 
+    constructor: function(options) {
+
+        this._super();
+
+        // Fast start
+        if (options) {
+            this.setup(options);
+        }
+    },
+
     /**
      *
      * @param {Object} options

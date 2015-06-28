@@ -75,6 +75,17 @@ Joints.defineClass('NeatComet.quickStart.legacyCometServer.CometClient', Joints.
      */
     _lastProtocol: '',
 
+    constructor: function(options) {
+
+        this._super();
+
+        // Fast start
+        if (options) {
+            _.extend(this, options);
+            this.init();
+        }
+    },
+
     init: function() {
         this._forceClosed = false;
         this._deferred = $.Deferred();

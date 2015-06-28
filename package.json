@@ -1,11 +1,14 @@
 {
   "name": "NeatComet",
   "version": "0.1.0",
-  "description": "Language-agnostic Meteor-style model synchronization layer for comet-applications",
+  "description": "Language-agnostic Meteor-style model synchronization layer for comet applications",
   "main": "src/server.js",
   "directories": {
     "doc": "docs",
     "test": "test"
+  },
+  "dependencies": {
+    "when": "latest"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

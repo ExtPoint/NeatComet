@@ -1,7 +1,7 @@
 var configs = {
     web: require('./web'),
     test: require('./test'),
-    custom: require('fs').existsSync(__dirname + '/../../../config.js') ? require('./../../../config') : {},
+    custom: {},
     base: {
         main: require('./base/main'),
         development: require('./base/development'),
@@ -34,4 +34,8 @@ module.exports = function(applicationName, mode, nodeEnv) {
         configs.custom[applicationName] || {},
 	    { profile: nodeEnv } // Set profile to config
     )
+};
+
+module.exports.loadCustom = function(fileName) {
+    eval('configs.custom = require(' + JSON.stringify(fileName) + ')');
 };

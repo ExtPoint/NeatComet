@@ -1,9 +1,18 @@
 var cluster = require('cluster');
 var configs = require('./configuration/bootstrap');
 
+// Load custom config
+// TODO: indicate mistakes to human
+// TODO: add param to enable debug mode
+var customConfigFile = process.argv[2];
+configs.loadCustom(customConfigFile);
+
 if (cluster.isMaster) {
     var BootstrapMaster = require('./lib/node-master/BootstrapMaster');
     var config = {
+        cluster: {
+            args: [customConfigFile, "--expose_gc"]
+        },
         applications: {
             comet: configs('comet'),
             http: configs('http')
@@ -15,7 +24,7 @@ if (cluster.isMaster) {
 
     var BootstrapWorker = require('./lib/node-master/BootstrapWorker');
     var bootstrapWorker = new BootstrapWorker();
-	bootstrapWorker.run = function (name, index) {
+    bootstrapWorker.run = function (name, index) {
 
         // Load all
         require('./bootstrap');
@@ -27,10 +36,10 @@ if (cluster.isMaster) {
         // Init framework
         Jii.init(config);
 
-		// Run services
+        // Run services
         switch (name) {
-	        case 'comet':
-	            Jii.app.comet.port = parseInt(Jii.app.comet.port) + parseInt(index);
+            case 'comet':
+                Jii.app.comet.port = parseInt(Jii.app.comet.port) + parseInt(index);
                 Jii.app.comet.urlPrefix = '/stat/node-comet/[0-9]+'; // template: /{version}/comet/{index}'
                 Jii.app.comet.start();
                 break;
@@ -52,7 +61,7 @@ if (cluster.isMaster) {
                 break;
         }
 
-	    Jii.app.redis.end();
+        Jii.app.redis.end();
     };
     bootstrapWorker.start();
 

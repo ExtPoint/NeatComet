@@ -24,13 +24,13 @@ Joints.defineClass('app.neat.NeatModule', Jii.base.Module, {
 
             comet: this.adapter,
 
-            configFileName: path.dirname(require.main.filename) + '/../app/config/cometBindingFiles.json',
+            configFileName: Jii.app.params.bindingsFile,
 
             // Use proxy to forward loadData calls
             externalDataLoader: function(requestParams) {
 
                 return Jii.app.getModule('proxy').request(
-                    'comet/api/load-data/',
+                    Jii.app.params.phpServerLoadDataAction,
                     { msg: JSON.stringify(requestParams) }
                 );
 

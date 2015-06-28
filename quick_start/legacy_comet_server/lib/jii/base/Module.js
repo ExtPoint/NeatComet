@@ -20,6 +20,8 @@ var self = Joints.defineClass('Jii.base.Module', Jii.base.Component, {
         modules: {}
     },
 
+    _initComponents: null,
+
     init: function() {
         this.params = {};
     },
@@ -31,6 +33,9 @@ var self = Joints.defineClass('Jii.base.Module', Jii.base.Component, {
     setConfiguration: function(config) {
         // Merge with defaults
         config = _.extend({}, this._baseConfig, config);
+
+        // Enable init at last
+        this._initComponents = [];
 
         // Preload components
         _.each(config.preload, _.bind(function(id) {
@@ -53,6 +58,12 @@ var self = Joints.defineClass('Jii.base.Module', Jii.base.Component, {
 
         // Add simple params to application
         this._super(config);
+
+        // Init at last
+        _.each(this._initComponents, function(component) {
+            component.init();
+        }, this);
+        this._initComponents = null;
     },
 
     /**
@@ -73,7 +84,13 @@ var self = Joints.defineClass('Jii.base.Module', Jii.base.Component, {
         // Create instance and set configuration
         this[id] = new componentClass();
         this[id].setConfiguration(config);
-        this[id].init();
+
+        if (this._initComponents !== null) {
+            this._initComponents.push(this[id]);
+        }
+        else {
+            this[id].init();
+        }
     },
 
     /**

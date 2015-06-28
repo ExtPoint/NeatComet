@@ -10,7 +10,7 @@
  */
 Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, {
 
-	/** @type {NeatComet.comet.BaseClient} */
+	/** @type {NeatComet.api.ICometClient} */
 	comet: null,
 
 	/** @type {Function} */
@@ -40,10 +40,13 @@ Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, {
 
 		_.extend(this, options);
 
+        // TODO: prettify
 		// Install comet listeners
 		if (!this._listenerInstalled) {
-			this.comet.onConnectionRestore(_.bind(this._onCometConnectionRestore, this));
-			this.comet.onMessage(_.bind(this._onCometMessage, this));
+			this.comet.bindEvents({
+                onConnectionRestore: _.bind(this._onCometConnectionRestore, this),
+                onMessage: _.bind(this._onCometMessage, this)
+            });
 			this._listenerInstalled = true;
 		}
 	},

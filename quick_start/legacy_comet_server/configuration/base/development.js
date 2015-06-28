@@ -7,10 +7,6 @@ module.exports = {
 		logger: {
 			level: 'debug'
 		}
-	},
-
-	params: {
-		phpServerUrl: 'http://chip-stat/stat'
 	}
 
 };

@@ -44,7 +44,9 @@ module.exports = {
 	},
 
 	params: {
-		phpServerUrl: ''
+		phpServerUrl: '',
+		phpServerLoadDataAction: 'comet/api/load-data/',
+        bindingsFile: ''
 	}
 
 };

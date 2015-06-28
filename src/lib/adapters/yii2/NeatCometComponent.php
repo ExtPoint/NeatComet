@@ -98,4 +98,45 @@ class NeatCometComponent extends Object implements IOrmLoader {
         return $query->asArray()->all();
     }
 
+    /**
+     * @param ActiveRecord $model
+     * @param boolean $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($model, $insert, $changedAttributes) {
+
+        if ($insert) {
+
+            $this->server->broadcastEvent(
+                // Route
+                get_class($model), 'sendAdd',
+                // Params
+                $model->attributes
+            );
+        }
+        else {
+
+            $this->server->broadcastEvent(
+                // Route
+                get_class($model), 'sendUpdate',
+                // Params
+                $model->attributes, $changedAttributes + $model->oldAttributes
+            );
+        }
+
+    }
+
+    /**
+     * @param ActiveRecord $model
+     */
+    public function afterDelete($model) {
+
+        $this->server->broadcastEvent(
+            // Route
+            get_class($model), 'sendRemove',
+            // Params
+            $model->attributes
+        );
+    }
+
 }

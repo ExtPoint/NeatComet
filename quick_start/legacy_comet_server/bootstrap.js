@@ -1,9 +1,11 @@
-global.Promise = require('when').Promise;
+if (!global.Promise) {
+    global.Promise = require('when').Promise;
+}
 
 // Load libs
 require('./lib/jii/main');
-require('../lib/NeatComet/server');
-require('../lib/NeatComet/lib/adapters/jii/JiiCometServerMultiProcess');
+require('../../src/server');
+require('../../src/lib/adapters/jii/JiiCometServerMultiProcess');
 
 // Load modules
 require('./modules/neat/package');

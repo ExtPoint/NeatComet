@@ -1,7 +1,7 @@
 /**
  * @callback NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter~idMapper
  * @param {*} attributes
- * @returns {string} action
+ * @returns {string}
  */
 (function() {
 

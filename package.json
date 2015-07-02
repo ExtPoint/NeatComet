@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Language-agnostic Meteor-style model synchronization layer for comet applications",
   "main": "src/server.js",
+  "browser": "src/client.js",
   "directories": {
     "doc": "docs",
     "test": "test"

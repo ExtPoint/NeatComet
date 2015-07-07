@@ -171,7 +171,7 @@ class BindingServer {
 
         if ($this->match !== null) {
             foreach ($this->match as $name => $value) {
-                $result->{$name} = $request[$value];
+                $result->{$name} = isset($request[$value]) ? $request[$value] : null;
             }
         }
 

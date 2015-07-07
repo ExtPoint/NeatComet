@@ -54,9 +54,17 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
 
     open: function() {
 
-        // Attach channels, before load data
         _.each(this.bindings, function(binding) {
+
+            // Reset master keys
+            _.each(binding.masterKeys, function(dummy, name) {
+                this.requestParams[binding.id + '.' + name] = UNINITIALIZED_PARAM;
+            }, this);
+            this._knownModels[binding.id] = {};
+
+            // Attach channels, before load data
             binding.channel.openProfile(this);
+
         }, this);
 
         // Load
@@ -77,6 +85,8 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
      */
     _loadNext: function(sets) {
 
+        var hasInstantlyLoaded = false;
+
         // Extract current portion and reset lists
         var bindings = sets.loadNext;
         sets.loadNow = {};
@@ -94,8 +104,10 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
                 var value = this.requestParams[paramKey];
                 if (_.isArray(value) && value.length === 0) {
 
-                    // Set result
+                    // Set result without DB query
+                    this._markBindingLoaded(binding);
                     sets.loaded[binding.id] = [];
+                    hasInstantlyLoaded = true;
 
                     // Stop
                     targetSet = null;
@@ -119,7 +131,13 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
 
             // Check sanity
             if (!_.isEmpty(sets.loadNext)) {
-                throw new NeatComet.Exception('Cycle links in bindings of ' + this.profile + ' profile');
+
+                // Handle successful load, if any
+                if (hasInstantlyLoaded) {
+                   return this._loadNext(sets);
+                }
+
+                throw new NeatComet.Exception('Cycle links in bindings of "' + this.profile + '" profile');
             }
 
             return when.resolve(sets.loaded);
@@ -139,6 +157,18 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
     },
 
     /**
+     * @param {NeatComet.bindings.BindingServer} binding
+     * @private
+     */
+    _markBindingLoaded: function(binding) {
+
+        // Replace UNINITIALIZED_PARAM with empty values
+        _.each(binding.masterKeys, function(dummy, name) {
+            this.requestParams[binding.id + '.' + name] = [];
+        }, this);
+    },
+
+    /**
      * @param {Object} sets
      * @param {Object.<string, Object>} sets.loaded
      * @param {Object.<string, NeatComet.bindings.BindingServer>} sets.loadNow
@@ -154,6 +184,10 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
 
             var binding = sets.loadNow[bindingId];
 
+            // Mark master keys loaded
+            this._markBindingLoaded(binding);
+
+            // Save loaded master keys
             _.each(data[index], function(attributes) {
                 this.updateMasterValues(
                     bindingId,
@@ -310,9 +344,6 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
             value = String(value);
 
             var bindingHash = this._knownModels[bindingId];
-            if (!bindingHash) {
-                this._knownModels[bindingId] = bindingHash = {};
-            }
 
             var attributeHash = bindingHash[name];
             if (!attributeHash) {
@@ -322,12 +353,7 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
             var valueHash = attributeHash[value];
             if (!valueHash) {
 
-                var paramName = bindingId + '.' + name;
-                if (this.requestParams[paramName] === UNINITIALIZED_PARAM) {
-                    this.requestParams[paramName] = [];
-                }
-
-                this.requestParams[paramName].push(value);
+                this.requestParams[bindingId + '.' + name].push(value);
                 attributeHash[value] = valueHash = {};
 
                 // Prepare data load

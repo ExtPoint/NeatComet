@@ -175,10 +175,15 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
      * @param {Object.<string, NeatComet.bindings.BindingServer>} sets.loadNext
      * @param {string[]} bindingIds
      * @param {Array} data
-     * @returns {Promise}
+     * @returns {Promise|null}
      * @private
      */
     _handleLoaded: function(sets, bindingIds, data) {
+
+        // Stop, if profile was closed during DB call
+        if (!this.profile) {
+            return null;
+        }
 
         _.each(bindingIds, function(bindingId, index) {
 

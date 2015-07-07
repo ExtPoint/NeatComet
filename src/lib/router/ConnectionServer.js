@@ -62,11 +62,12 @@ var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object
 
             // Track opened profile
             var openedProfile = this._addOpenedProfile(profile, profileRequestParams);
+            var result = openedProfile.open();
 
-            promises.push(
-                openedProfile.open()
-            );
-            openedProfiles.push(openedProfile);
+            if (result !== null) {
+                promises.push(result);
+                openedProfiles.push(openedProfile);
+            }
 
         }, this);
 

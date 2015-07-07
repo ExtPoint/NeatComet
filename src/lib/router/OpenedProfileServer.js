@@ -11,7 +11,7 @@ var UNINITIALIZED_PARAM = {};
  * @class NeatComet.router.OpenedProfileServer
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Object, /** @lends NeatComet.router.OpenedProfileServer.prototype */{
 
     /** @type {number} */
     id: null,

@@ -8,7 +8,7 @@
  * @class NeatComet.SafeChannelClient
  * @extends Joints.Object
  */
-Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, {
+Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, /** @lends NeatComet.SafeChannelClient.prototype */{
 
 	/** @type {NeatComet.api.ICometClient} */
 	comet: null,

@@ -8,7 +8,7 @@
  * @class NeatComet.channels.DirectChannelServer
  * @extends NeatComet.channels.BaseChannelServer
  */
-var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatComet.channels.BaseChannelServer, {
+var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatComet.channels.BaseChannelServer, /** @lends NeatComet.channels.DirectChannelServer.prototype */{
 
     channelPrefix: '',
 

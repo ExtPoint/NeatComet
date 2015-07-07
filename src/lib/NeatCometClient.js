@@ -10,7 +10,7 @@
  * @class NeatComet.NeatCometClient
  * @extends Joints.Object
  */
-Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, {
+Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatComet.NeatCometClient.prototype */{
 
     /** @type {NeatComet.NeatCometClient~getCollection} */
     getCollection: null,

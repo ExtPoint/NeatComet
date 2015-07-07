@@ -10,7 +10,7 @@ var when = require('when');
  * @extends Joints.Object
  * @implements NeatComet.api.ICometServerEvents
  */
-var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, /** @lends NeatComet.router.RouteServer.prototype */{
 
     /** @type {NeatComet.NeatCometServer} */
     server: null,

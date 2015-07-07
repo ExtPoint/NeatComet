@@ -11,7 +11,7 @@ var path = require('path');
  * @class NeatComet.configReader.ConfigReader
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.configReader.ConfigReader', Joints.Object, {
+var self = Joints.defineClass('NeatComet.configReader.ConfigReader', Joints.Object, /** @lends NeatComet.configReader.ConfigReader.prototype */{
 
 }, {
 

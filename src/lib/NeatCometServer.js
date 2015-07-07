@@ -12,7 +12,7 @@ var path = require('path');
  * @class NeatComet.NeatCometServer
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @lends NeatComet.NeatCometServer.prototype */{
 
     /** @type {Object.<string, Object.<string, NeatComet.bindings.BindingServer>>} */
     profileBindings: null,

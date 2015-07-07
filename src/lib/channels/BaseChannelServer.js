@@ -18,7 +18,7 @@
  * @class NeatComet.channels.BaseChannelServer
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.channels.BaseChannelServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.channels.BaseChannelServer', Joints.Object, /** @lends NeatComet.channels.BaseChannelServer.prototype */{
 
     /** @type {NeatComet.bindings.BindingServer} */
     binding: null,

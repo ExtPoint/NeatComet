@@ -8,7 +8,7 @@
  * @class NeatComet.SimpleCollectionMapperClient
  * @extends Joints.Object
  */
-Joints.defineClass('NeatComet.SimpleCollectionMapperClient', Joints.Object, {
+Joints.defineClass('NeatComet.SimpleCollectionMapperClient', Joints.Object, /** @lends NeatComet.SimpleCollectionMapperClient.prototype */{
 
     /** @type {function} */
     createCollection: null,

@@ -9,7 +9,7 @@ var when = require('when');
  * @class NeatComet.router.ConnectionServer
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object, /** @lends NeatComet.router.ConnectionServer.prototype */{
 
     /** @type {string} */
     connectionId: null,

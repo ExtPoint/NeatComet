@@ -8,7 +8,7 @@
  * @class NeatComet.bindings.BindingServer
  * @extends Joints.Object
  */
-var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object, {
+var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object, /** @lends NeatComet.bindings.BindingServer.prototype */{
 
     /** Id **/
 

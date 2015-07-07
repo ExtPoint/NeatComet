@@ -8,7 +8,7 @@
  * @class NeatComet.Exception
  * @extends Joints.Object
  */
-Joints.defineClass('NeatComet.Exception', Joints.Object, {
+Joints.defineClass('NeatComet.Exception', Joints.Object, /** @lends NeatComet.Exception.prototype */{
 
 	msg: null,
 

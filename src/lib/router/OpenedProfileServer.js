@@ -74,11 +74,14 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
                 loadNow: null,
                 loadNext: this.bindings
             })
-            .done(_.bind(function() {
+            .then(_.bind(function(result) {
+
                 // Attach channels, before load data
                 _.each(this.bindings, function(binding) {
                     binding.channel.openProfile(this);
                 }, this);
+
+                return result;
             }, this));
     },
 

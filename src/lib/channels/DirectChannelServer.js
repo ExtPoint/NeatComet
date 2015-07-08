@@ -26,7 +26,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
             if (currentName !== null) {
                 newRest[name] = restParams[name];
             }
-            else if (!_.isArray()) {
+            else if (!_.isArray(restParams[name])) {
 
                 // Client has disabled the channel
                 if (restParams[name] === null) {

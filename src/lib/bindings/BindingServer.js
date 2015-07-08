@@ -134,14 +134,33 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
         throw new NeatComet.Exception('Not implemtented');
     },
 
-    applyAttributesToMatchObject: function(request) {
+    /**
+     * @param {Object} request
+     * @returns {Object}
+     */
+    applyRequestToMatchObject: function(request) {
 
         var result = {};
 
-        // Apply request
-        _.each(this.match, function(sourceName, targetName) {
-            result[targetName] = request[sourceName];
+        // Apply match
+        _.each(this.match, function(requestName, attributeName) {
+            result[attributeName] = request[requestName];
         });
+
+        // Apply constants
+        return _.assign(result, this.matchConst);
+    },
+
+    /**
+     * @param {Object} attributes
+     * @returns {Object}
+     */
+    applyAttributesToMatchObject: function(attributes) {
+
+        var result;
+
+        // Apply match
+        result = this.match ? NeatComet.NeatCometServer.intersectKeys(attributes, this.match) : {};
 
         // Apply constants
         return _.assign(result, this.matchConst);

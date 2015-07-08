@@ -78,8 +78,9 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
      * @param {Function} [sender]
      * @param {NeatComet.router.OpenedProfileServer} [openedProfile]
      * @returns {NeatComet.channels.FiltersList}
+     * @private
      */
-    getFilters: function(params, sender, openedProfile) {
+    _getFilters: function(params, sender, openedProfile) {
 
         /** @type {NeatComet.channels.FiltersList} */
         var result = {
@@ -118,7 +119,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
 
             getChannelFn = function(scalarParams) {
                 var channel = '';
-                _.each(this.binding.applyAttributesToMatchObject(scalarParams), function(value, name) {
+                _.each(scalarParams, function(value, name) {
                     if (channel !== '') {
                         channel += ':';
                     }
@@ -147,21 +148,21 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
     },
 
     /**
-     *
      * @param {Object.<string, (string[]|string[][])>} params
      * @returns {string[]}
+     * @private
      */
-    getChannels: function(params) {
-        return _.keys(this.getFilters(params).channels);
+    _getChannels: function(params) {
+        return _.keys(this._getFilters(params).channels);
     },
 
     /**
-     *
      * @param {Object.<string, (string[])>} params
      * @returns {string}
+     * @private
      */
-    getChannel: function(params) {
-        return this.getChannels(params)[0];
+    _getChannel: function(params) {
+        return this._getChannels(params)[0];
     },
 
     /**
@@ -177,7 +178,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
         var pusher = this._createPusher(openedProfile.connection, '!' + openedProfile.id + ':' + this.binding.id);
 
         // Check if enabled for the current set of parameters
-        filters = this.getFilters(openedProfile.requestParams, pusher, openedProfile);
+        filters = this._getFilters(this.binding.applyRequestToMatchObject(openedProfile.requestParams), pusher, openedProfile);
         if (_.isEmpty(filters.channels)) {
             return;
         }

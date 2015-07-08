@@ -122,7 +122,7 @@ class BindingServer {
     public function loadDataLocally($request) {
 
         $match = isset($this->match) ?
-            $this->applyAttributesToMatchObject($request) :
+            $this->applyRequestToMatchObject($request) :
             null;
 
         if (isset($this->whereSql)) {
@@ -165,19 +165,47 @@ class BindingServer {
      * @param array $request
      * @return \StdClass
      */
-    public function applyAttributesToMatchObject($request) {
+    public function applyRequestToMatchObject($request) {
 
         $result = new \StdClass;
 
+        // Apply match
         if ($this->match !== null) {
-            foreach ($this->match as $name => $value) {
-                $result->{$name} = isset($request[$value]) ? $request[$value] : null;
+            foreach ($this->match as $attributeName => $requestName) {
+                $result->{$attributeName} = $request[$requestName];
             }
         }
 
+        // Apply constants
         if ($this->matchConst !== null) {
-            foreach ($this->matchConst as $name => $value) {
-                $result->{$name} = $value;
+            foreach ($this->matchConst as $attributeName => $value) {
+                $result->{$attributeName} = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $attributes
+     * @return \StdClass
+     */
+    public function applyAttributesToMatchObject($attributes) {
+
+        $result = new \StdClass;
+
+        // Apply match
+        if ($this->match !== null) {
+            // This is array_intersect_key, but for StdClass
+            foreach ($this->match as $attributeName => $requestName) {
+                $result->{$attributeName} = $attributes[$attributeName];
+            }
+        }
+
+        // Apply constants
+        if ($this->matchConst !== null) {
+            foreach ($this->matchConst as $attributeName => $value) {
+                $result->{$attributeName} = $value;
             }
         }
 

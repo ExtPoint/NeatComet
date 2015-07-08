@@ -6,7 +6,7 @@ class DirectChannelServer extends BaseChannelServer {
 
     const CONSTANT_CHANNEL = '1';
 
-    protected static function iterateParams($params, $restParams, $tailFn) {
+    private static function iterateParams($params, $restParams, $tailFn) {
 
         reset($restParams);
         while (list($name, $value) = each($restParams)) {
@@ -44,10 +44,10 @@ class DirectChannelServer extends BaseChannelServer {
     }
 
     /**
-     * @param string[]|string[][] $params
+     * @param string[]|string[][]|\StdClass $params
      * @return string[]
      */
-    public function getChannels($params) {
+    private function getChannels($params) {
 
         // Format by template, if any
         if (isset($this->binding->channelTemplate)) {
@@ -69,7 +69,7 @@ class DirectChannelServer extends BaseChannelServer {
             $result = [];
             self::iterateParams($params, $params, function($scalarParams) use (&$result) {
                 $channel = '';
-                foreach ($this->binding->applyAttributesToMatchObject($scalarParams) as $name => $value) {
+                foreach ($scalarParams as $name => $value) {
                     if ($channel !== '') {
                         $channel .= ':';
                     }
@@ -88,14 +88,22 @@ class DirectChannelServer extends BaseChannelServer {
      * @param string[] $attributes
      * @return string
      */
-    public function getChannel($attributes) {
+    private function getChannelByAttributes($attributes) {
+        return $this->getChannel($this->binding->applyAttributesToMatchObject($attributes));
+    }
+
+    /**
+     * @param string[]|\StdClass $params
+     * @return string
+     */
+    private function getChannel($params) {
 
         // Format by template, if any
         if (isset($this->binding->channelTemplate)) {
             return preg_replace_callback(
                 '/{(\w+)}/',
-                function($matches) use ($attributes) {
-                    return $attributes[$matches[1]];
+                function($matches) use ($params) {
+                    return $params[$matches[1]];
                 },
                 $this->binding->channelTemplate
             );
@@ -104,7 +112,7 @@ class DirectChannelServer extends BaseChannelServer {
         // Format by match object, if set
         if (isset($this->binding->match)) {
             $channel = '';
-            foreach ($this->binding->applyAttributesToMatchObject($attributes) as $name => $value) {
+            foreach ($params as $name => $value) {
                 if ($channel !== '') {
                     $channel .= ':';
                 }
@@ -128,13 +136,13 @@ class DirectChannelServer extends BaseChannelServer {
 
     public function sendAdd($attributeValues) {
 
-        $this->push($this->getChannel($attributeValues), ["add", $attributeValues]);
+        $this->push($this->getChannelByAttributes($attributeValues), ["add", $attributeValues]);
     }
 
     public function sendUpdate($updatedAttributeValues, $oldAttributeValues) {
 
-        $newChannel = $this->getChannel($updatedAttributeValues);
-        $oldChannel = $this->getChannel($oldAttributeValues);
+        $newChannel = $this->getChannelByAttributes($updatedAttributeValues);
+        $oldChannel = $this->getChannelByAttributes($oldAttributeValues);
 
         if ($newChannel !== $oldChannel) {
             $this->push($newChannel, ["add", $updatedAttributeValues]);
@@ -147,6 +155,6 @@ class DirectChannelServer extends BaseChannelServer {
 
     public function sendRemove($oldAttributeValues) {
 
-        $this->push($this->getChannel($oldAttributeValues), ["remove", $oldAttributeValues]);
+        $this->push($this->getChannelByAttributes($oldAttributeValues), ["remove", $oldAttributeValues]);
     }
 }

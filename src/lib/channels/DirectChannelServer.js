@@ -123,7 +123,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
                     if (channel !== '') {
                         channel += ':';
                     }
-                    channel += value == null ? name : (name + '=' + value);
+                    channel += value === null ? name : (name + '=' + value);
                 });
                 return channel;
             }.bind(this);

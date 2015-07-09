@@ -116,7 +116,7 @@ class DirectChannelServer extends BaseChannelServer {
                 if ($channel !== '') {
                     $channel .= ':';
                 }
-                $channel .= $name . '=' . $value;
+                $channel .= $value === null ? $name : ($name . '=' . $value);
             }
             return $channel;
         }

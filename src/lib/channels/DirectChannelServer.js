@@ -102,7 +102,8 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
                 return channelTemplate.replace(
                     regexp,
                     function(match, p1) {
-                        return scalarParams[p1];
+                        var x = scalarParams[p1];
+                        return x === null ? '' : x;
                     }
                 );
             }.bind(this);

@@ -11,6 +11,9 @@
   "dependencies": {
     "when": "latest"
   },
+  "devDependencies": {
+    "nodeunit": "^0.9.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

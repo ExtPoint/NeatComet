@@ -157,13 +157,19 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
      */
     applyAttributesToMatchObject: function(attributes) {
 
-        var result;
+        var result = {};
 
         // Apply match
-        result = this.match ? NeatComet.NeatCometServer.intersectKeys(attributes, this.match) : {};
+        _.each(this.match, function(requestName, attributeName) {
+            result[attributeName] = attributes[attributeName];
+        });
 
         // Apply constants
-        return _.assign(result, this.matchConst);
+        _.each(this.matchConst, function(value, attributeName) {
+            result[attributeName] = attributes[attributeName];
+        });
+
+        return result;
     },
 
 

@@ -205,7 +205,7 @@ class BindingServer {
         // Apply constants
         if ($this->matchConst !== null) {
             foreach ($this->matchConst as $attributeName => $value) {
-                $result->{$attributeName} = $value;
+                $result->{$attributeName} = $attributes[$attributeName];
             }
         }
 

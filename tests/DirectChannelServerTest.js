@@ -32,6 +32,8 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
 
     // Mock
     var requestParams = {}; // Contents does not matter
+    var ultimateChannelSender;
+    var channelSender = function() {};
 
     directChannelServer.binding.applyRequestToMatchObject = function(request) {
         test.equal(arguments.length, 1);
@@ -44,7 +46,11 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
         test.ok(_.isFunction(sender));
         test.deepEqual(params, bindingAppliedParams);
         test.strictEqual(openedProfile, theOpenedProfile);
-        return sender;
+
+        // Remember to test further
+        ultimateChannelSender = sender;
+
+        return channelSender;
     };
 
     _.extend(directChannelServer.binding, binding);
@@ -60,8 +66,9 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
         addChannels: function(channelsMap, directSender) {
             test.equal(arguments.length, 2);
             test.ok(_.isFunction(directSender));
+            test.equal(ultimateChannelSender, directSender);
 
-            testChannels(channelsMap, directSender);
+            testChannels(channelsMap, channelSender);
 
             // Test directSender, see pushToClient below
             directSender('theSourceChannel (unused)', ["add", { 'y': 1 }]);
@@ -139,13 +146,13 @@ module.exports = {
                 'theAttribute': 'theValue',
                 'theConstantAttribute': 'theConstantValue'
             },
-            function (channelsMap, directSender) {
+            function (channelsMap, sender) {
 
-                test.deepEqual(channelsMap, { 'theProfile:theBinding:1': directSender });
+                test.deepEqual(channelsMap, { 'theProfile:theBinding:1': sender });
             }
         );
 
-        test.expect(13);
+        test.expect(14);
         test.done();
     },
 
@@ -165,16 +172,16 @@ module.exports = {
                 'theAttribute': 'theValue',
                 'theConstantAttribute': 'theConstantValue'
             },
-            function (channelsMap, directSender) {
+            function (channelsMap, sender) {
 
                 test.deepEqual(
                     channelsMap,
-                    { 'theProfile:theBinding:theAttribute=theValue:theConstantAttribute=theConstantValue': directSender }
+                    { 'theProfile:theBinding:theAttribute=theValue:theConstantAttribute=theConstantValue': sender }
                 );
             }
         );
 
-        test.expect(13);
+        test.expect(14);
         test.done();
     },
 
@@ -192,16 +199,16 @@ module.exports = {
                 'theAttribute': 'theValue',
                 'theConstantAttribute': 'theConstantValue'
             },
-            function (channelsMap, directSender) {
+            function (channelsMap, sender) {
 
                 test.deepEqual(
                     channelsMap,
-                    { 'theProfile:theBinding:theValue:theConstantValue': directSender }
+                    { 'theProfile:theBinding:theValue:theConstantValue': sender }
                 );
             }
         );
 
-        test.expect(13);
+        test.expect(14);
         test.done();
     },
 
@@ -219,20 +226,20 @@ module.exports = {
                 'theAttribute': ['theValue1', 'theValue2', null],
                 'theConstantAttribute': 'theConstantValue'
             },
-            function (channelsMap, directSender) {
+            function (channelsMap, sender) {
 
                 test.deepEqual(
                     channelsMap,
                     {
-                        'theProfile:theBinding:theValue1:theConstantValue': directSender,
-                        'theProfile:theBinding:theValue2:theConstantValue': directSender,
-                        'theProfile:theBinding::theConstantValue': directSender
+                        'theProfile:theBinding:theValue1:theConstantValue': sender,
+                        'theProfile:theBinding:theValue2:theConstantValue': sender,
+                        'theProfile:theBinding::theConstantValue': sender
                     }
                 );
             }
         );
 
-        test.expect(21);
+        test.expect(22);
         test.done();
     },
 
@@ -252,20 +259,20 @@ module.exports = {
                 'theAttribute': ['theValue1', 'theValue2', null],
                 'theConstantAttribute': 'theConstantValue'
             },
-            function (channelsMap, directSender) {
+            function (channelsMap, sender) {
 
                 test.deepEqual(
                     channelsMap,
                     {
-                        'theProfile:theBinding:theAttribute=theValue1:theConstantAttribute=theConstantValue': directSender,
-                        'theProfile:theBinding:theAttribute=theValue2:theConstantAttribute=theConstantValue': directSender,
-                        'theProfile:theBinding:theAttribute:theConstantAttribute=theConstantValue': directSender
+                        'theProfile:theBinding:theAttribute=theValue1:theConstantAttribute=theConstantValue': sender,
+                        'theProfile:theBinding:theAttribute=theValue2:theConstantAttribute=theConstantValue': sender,
+                        'theProfile:theBinding:theAttribute:theConstantAttribute=theConstantValue': sender
                     }
                 );
             }
         );
 
-        test.expect(21);
+        test.expect(22);
         test.done();
     }
 };

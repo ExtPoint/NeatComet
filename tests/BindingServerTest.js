@@ -89,7 +89,6 @@ module.exports = {
             { theAttributesScalar: 'theAttributesScalarValue', theConst: 'theAttributesConstValue' }
         );
 
-        /* TODO:
         testApplyXxxToMatchObject(test,
             {
                 match: {
@@ -100,7 +99,7 @@ module.exports = {
                 }
             },
             { theAttributesScalar: ['theRequestScalarValue', 'theRequestMultiple1', 'theRequestMultiple2', null], theConst: 'theConstValue' },
-            { theAttributesScalar: 'theAttributesScalarValue', theConst: 'theConstValue' }
+            { theAttributesScalar: 'theAttributesScalarValue', theConst: 'theAttributesConstValue' }
         );
 
         testApplyXxxToMatchObject(test,
@@ -114,7 +113,20 @@ module.exports = {
             },
             { theAttributesScalar: ['theRequestScalarValue', 'theRequestMultiple1', 'theRequestMultiple2', null, 'theConstValue'] },
             { theAttributesScalar: 'theAttributesScalarValue' }
-        );*/
+        );
+
+        testApplyXxxToMatchObject(test,
+            {
+                match: {
+                    theAttributesScalar: ['theRequestScalar', 'theRequest.Multiple']
+                },
+                matchConst: {
+                    theAttributesScalar: ['theConstValue1', 'theConstValue2']
+                }
+            },
+            { theAttributesScalar: ['theRequestScalarValue', 'theRequestMultiple1', 'theRequestMultiple2', null, 'theConstValue1', 'theConstValue2'] },
+            { theAttributesScalar: 'theAttributesScalarValue' }
+        );
 
         test.done();
     }

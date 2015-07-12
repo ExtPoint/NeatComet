@@ -172,14 +172,41 @@ class BindingServer {
         // Apply match
         if ($this->match !== null) {
             foreach ($this->match as $attributeName => $requestName) {
-                $result->{$attributeName} = $request[$requestName];
+                if (is_array($requestName)) {
+                    $list = [];
+                    foreach ($list as $requestNameScalar) {
+                        if (is_array($request[$requestNameScalar])) {
+                            $list = array_merge($list, $request[$requestNameScalar]);
+                        }
+                        else {
+                            $list[] = $request[$requestNameScalar];
+                        }
+                    }
+                    $result->{$attributeName} = $list;
+                }
+                else {
+                    $result->{$attributeName} = $request[$requestName];
+                }
             }
         }
 
         // Apply constants
         if ($this->matchConst !== null) {
             foreach ($this->matchConst as $attributeName => $value) {
-                $result->{$attributeName} = $value;
+                if (property_exists($result, $attributeName)) {
+                    if (!is_array($result->{$attributeName})) {
+                        $result->{$attributeName} = [$result->{$attributeName}];
+                    }
+                    if (is_array($value)) {
+                        $result->{$attributeName} = array_merge($result->{$attributeName}, $value);
+                    }
+                    else {
+                        $result->{$attributeName}[] = $value;
+                    }
+                }
+                else {
+                    $result->{$attributeName} = $value;
+                }
             }
         }
 

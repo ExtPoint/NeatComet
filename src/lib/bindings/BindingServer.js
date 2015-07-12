@@ -131,7 +131,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
     loadDataLocally: function(params) {
 
         // TODO: implement this
-        throw new NeatComet.Exception('Not implemtented');
+        throw new NeatComet.Exception('Not implemented');
     },
 
     /**
@@ -144,11 +144,43 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
 
         // Apply match
         _.each(this.match, function(requestName, attributeName) {
-            result[attributeName] = request[requestName];
+            if (_.isArray(requestName)) {
+                var list = [];
+                for (var i = 0; i < requestName.length; i++) {
+                    var value = request[requestName[i]];
+                    if (_.isArray(value)) {
+                        list = list.concat(value);
+                    }
+                    else {
+                        list.push(value);
+                    }
+                }
+                result[attributeName] = list;
+            }
+            else {
+                result[attributeName] = request[requestName];
+            }
         });
 
-        // Apply constants
-        return _.assign(result, this.matchConst);
+        // Apply match
+        _.each(this.matchConst, function(value, attributeName) {
+            if (_.has(result, attributeName)) {
+                if (!_.isArray(result[attributeName])) {
+                    result[attributeName] = [result[attributeName]];
+                }
+                if (_.isArray(value)) {
+                    result[attributeName] = result[attributeName].concat(value);
+                }
+                else {
+                    result[attributeName].push(value);
+                }
+            }
+            else {
+                result[attributeName] = value;
+            }
+        });
+
+        return result;
     },
 
     /**

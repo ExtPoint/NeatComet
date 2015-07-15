@@ -14,3 +14,9 @@ This is a general plan. TODO: detail it to become a guide.
 4. Add to Backbone client
 5. Init bindings
 6. Create command to run the server
+
+# Run tests
+
+1. `cd` into the directory, where this README.md file is.
+2. Ensure `npm install` was called here.
+3. Run `./node_modules/.bin/extnodeunit tests`

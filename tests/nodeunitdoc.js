@@ -42,6 +42,12 @@ NodeUnit.prototype = {
     expect: function(amount) {},
 
     /**
+     * @param {string} name
+     * @param {...(function|Object)} call
+     */
+    mockFunction: function(name, call) {},
+
+    /**
      * @param [err]
      */
     done: function(err) {}

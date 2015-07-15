@@ -12,7 +12,7 @@
     "when": "latest"
   },
   "devDependencies": {
-    "nodeunit": "^0.9.1"
+    "extnodeunit": "ExtPoint/extnodeunit"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

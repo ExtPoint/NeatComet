@@ -63,12 +63,16 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
         if (_.isArray(this.match)) {
             this.match = _.object(this.match, this.match);
         }
-        /* TODO: port this from PHP
-        elseif ($this->match === null && $this->channelTemplate !== null) {
-            if (preg_match_all('/{(\w+)}/', $this->channelTemplate, $matches)) {
-                $this->match = (object)array_combine($matches[1], $matches[1]);
+        else if (this.match === null && this.channelTemplate !== null) {
+            var reg = /{(\w+)}/g,
+                match;
+            while (match = reg.exec(this.channelTemplate)) {
+                if (this.match === null) {
+                    this.match = {};
+                }
+                this.match[match[1]] = match[1];
             }
-        } */
+        }
 
         this.neatComet = neatComet;
         this.profile = profile;
@@ -104,14 +108,6 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
                 }
             }, this);
         }
-    },
-
-    /**
-     * @returns {*}
-     */
-    getClientParams: function() {
-        // TODO: remove this method
-        return this.client;
     },
 
     /**
@@ -249,8 +245,8 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
             // Split updates into add and remove
             if (message[0] === 'update') {
 
-                var newMatches = jsFilter(message[2]);
-                var oldMatches = jsFilter(message[1]);
+                var newMatches = jsFilter(message[1]);
+                var oldMatches = jsFilter(message[2]);
 
                 if (!newMatches && !oldMatches) {
                     return; // Irrelevant message

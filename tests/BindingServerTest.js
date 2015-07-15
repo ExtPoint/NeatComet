@@ -2,6 +2,10 @@ require('./bootstrap');
 require('../src/lib/NeatCometServer'); // For intersectKeys, TODO: extract utils
 require('../src/lib/bindings/BindingServer');
 
+/**
+ * @param {Object} definition
+ * @returns {NeatComet.bindings.BindingServer}
+ */
 function initSubject(definition) {
 
     // Mock
@@ -51,6 +55,31 @@ function testApplyXxxToMatchObject(test, definition, applyRequestResult, applyAt
         bindingServer.applyAttributesToMatchObject(attributes),
         applyAttributesResult
     );
+}
+
+/**
+ * @param {NodeUnit} test
+ * @param {Array} challenge
+ * @param {?Array} response
+ */
+function testJsFilter(test, challenge, response) {
+
+    var bindingServer = initSubject({
+        where: 'model.theAttribute >= {theRequestParam}'
+    });
+
+    var jsFilter = bindingServer.composeJsFilter(
+        response ?
+            test.mockFunction('sender', ['theChannel', response]) :
+            test.mockFunction('sender'),
+        {
+            'theRequestParam': 'theMatchingValue'
+        },
+        // openedProfile: NeatComet.router.OpenedProfileServer
+        {}
+    );
+
+    jsFilter('theChannel', challenge);
 }
 
 module.exports = {
@@ -129,5 +158,167 @@ module.exports = {
         );
 
         test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test composeJsFilter direct": function(test) {
+
+        var plainSender = function(){};
+
+        var bindingServer = initSubject({
+        });
+        test.deepEqual(bindingServer.masterKeys, {});
+
+        var jsFilter = bindingServer.composeJsFilter(
+            plainSender,
+            {},
+            // openedProfile: NeatComet.router.OpenedProfileServer
+            {}
+        );
+
+        test.strictEqual(jsFilter, plainSender);
+
+        test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test composeJsFilter for relations": function(test) {
+
+        var bindingServer = initSubject({
+        });
+
+        // Mock masterKeys
+        bindingServer.masterKeys = {
+            'theMasterAttribute': [
+                // Mock detail BindingServer
+                {}
+            ]
+        };
+
+        var mockSender = test.mockFunction('sender',
+            ['theChannel', ["add", { 'id': 'theId', 'theAttribute': 'theMatchingValue', 'theMasterAttribute': 'theMasterValue' }]]
+        );
+
+        var jsFilter = bindingServer.composeJsFilter(
+            mockSender,
+            {},
+            // openedProfile: NeatComet.router.OpenedProfileServer
+            {
+                updateMasterValues: test.mockFunction('updateMasterValues',
+                    ['theBinding', 'theId', { 'theMasterAttribute': 'theMasterValue' }]
+                )
+            }
+        );
+
+        // Make sure it was covered
+        test.notEqual(jsFilter, mockSender);
+
+        jsFilter('theChannel', ["add", { 'id': 'theId', 'theAttribute': 'theMatchingValue', 'theMasterAttribute': 'theMasterValue' }]);
+
+        test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test composeJsFilter for JS-where": function(test) {
+
+        // Test various command split combinations
+        testJsFilter(test,
+            ["add", { 'theAttribute': 'theIrrelevantValue' }],
+            null
+        );
+
+        testJsFilter(test,
+            ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 1 }],
+            ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 1 }]
+        );
+
+        testJsFilter(test,
+            ["remove", { 'theAttribute': 'theIrrelevantValue' }],
+            null
+        );
+
+        testJsFilter(test,
+            ["remove", { 'theAttribute': 'theMatchingValue' }],
+            ["remove", { 'theAttribute': 'theMatchingValue' }]
+        );
+
+        testJsFilter(test,
+            ["update",
+                { 'theAttribute': 'theMatchingValue2', 'somePayload': 5 },
+                { 'theAttribute': 'theMatchingValue' }
+            ],
+            ["update",
+                { 'theAttribute': 'theMatchingValue2', 'somePayload': 5 },
+                { 'theAttribute': 'theMatchingValue' }
+            ]
+        );
+
+        testJsFilter(test,
+            ["update",
+                { 'theAttribute': 'theMatchingValue', 'somePayload': 2 },
+                { 'theAttribute': 'theIrrelevantValue' }
+            ],
+            ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 2 }]
+        );
+
+        testJsFilter(test,
+            ["update",
+                { 'theAttribute': 'theIrrelevantValue', 'somePayload': 3 },
+                { 'theAttribute': 'theMatchingValue' }
+            ],
+            ["remove", { 'theAttribute': 'theMatchingValue' }]
+        );
+
+        test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test constructor": function(test) {
+
+        var bindingServer;
+
+
+        bindingServer = initSubject({
+            channelTemplate: 'abc'
+        });
+        test.equal(bindingServer.channelTemplate, 'abc');
+        test.strictEqual(bindingServer.match, null);
+
+
+        bindingServer = initSubject({
+            channelTemplate: 'abc{def}ghi{jkl}'
+        });
+        test.deepEqual(bindingServer.match, { 'def': 'def', 'jkl': 'jkl' });
+
+
+        bindingServer = initSubject({
+            match: ['abc', 'def']
+        });
+        test.deepEqual(bindingServer.match, { 'abc': 'abc', 'def': 'def' });
+
+
+        test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test primitives": function(test) {
+
+        var bindingServer = initSubject({
+        });
+
+        test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'abc');
+
+        test.done();
     }
+
 };

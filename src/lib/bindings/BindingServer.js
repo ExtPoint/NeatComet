@@ -86,7 +86,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
     },
 
     /**
-     * @param {NeatComet.bindings.BindingServer[]} allBindings
+     * @param {Object.<string, NeatComet.bindings.BindingServer>} allBindings
      */
     initRelations: function(allBindings) {
 

@@ -319,6 +319,53 @@ module.exports = {
         test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'abc');
 
         test.done();
+    },
+
+    /**
+     * @param {NodeUnit} test
+     */
+    "test initRelations": function(test) {
+
+        function attempt(definition, expectedResult) {
+
+            var allRelationsMock = {
+                'theMasterBinding': {
+                    masterKeys: {}
+                }
+            };
+
+            var bindingServer = initSubject(definition);
+
+            allRelationsMock[bindingServer.id] = bindingServer;
+
+            bindingServer.initRelations(allRelationsMock);
+
+            test.deepEqual(bindingServer.masterKeys, {});
+            test.deepEqual(allRelationsMock.theMasterBinding.masterKeys, expectedResult(bindingServer));
+        }
+
+
+        attempt(
+            {},
+            function(bindingServer) { return {} }
+        );
+
+
+        attempt(
+            {
+                match: {
+                    'theDetailAttribute': 'theMasterBinding.theMasterAttribute'
+                }
+            },
+            function(bindingServer) {
+                return {
+                    theMasterAttribute: [bindingServer]
+                }
+            }
+        );
+
+
+        test.done();
     }
 
 };

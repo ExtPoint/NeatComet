@@ -209,7 +209,6 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
     /**
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @param {Array} message
-     * @private
      */
     push: function(openedProfile, message) {
 

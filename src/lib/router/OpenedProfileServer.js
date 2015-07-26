@@ -408,26 +408,32 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
 
             var attributeHash = this._knownModels[bindingId][name];
             var valueHash = attributeHash[value];
-            delete valueHash[removeOfModelId];
 
-            if (_.isEmpty(valueHash)) {
+            // This condition prevents crash in case of unexpected input
+            // During normal flow it must be always true
+            if (valueHash && valueHash[removeOfModelId]) {
 
-                delete attributeHash[value];
-                var paramName = bindingId + '.' + name;
-                var values = this.requestParams[paramName];
-                values.splice(values.indexOf(value), 1);
+                delete valueHash[removeOfModelId];
 
-                if (removed) {
-                    removed[name] = value;
-                    minimalParams[paramName].splice(minimalParams[paramName].indexOf(value), 1);
+                if (_.isEmpty(valueHash)) {
+
+                    delete attributeHash[value];
+                    var paramName = bindingId + '.' + name;
+                    var values = this.requestParams[paramName];
+                    values.splice(values.indexOf(value), 1);
+
+                    if (removed) {
+                        removed[name] = value;
+                        minimalParams[paramName].splice(minimalParams[paramName].indexOf(value), 1);
+                    }
+
+                    // Don't delete bindingHash and nameHash, in fact they are constant
                 }
-
-                // Don't delete bindingHash and nameHash, in fact they are constant
             }
         }, this);
 
         // Stop here, if no cascade
-        if (noCascade) {
+        if (noCascade || (_.isEmpty(added) && _.isEmpty(removed))) {
             return;
         }
 

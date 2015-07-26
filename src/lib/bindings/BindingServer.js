@@ -319,7 +319,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
                     }
                 }, this);
 
-                if (add !== null || remove !== null) {
+                if (add !== null) {
                     openedProfile.updateMasterValues(
                         this.id,
                         add === null ? null : this.getIdFromAttributes(message[1]),

@@ -33,6 +33,14 @@ var self = Joints.defineClass('NeatComet.channels.BaseChannelServer', Joints.Obj
 
     init: function() {
 
+    },
+
+    /**
+     * @param {NeatComet.router.OpenedProfileServer} openedProfile
+     * @param {Array} message
+     */
+    push: function(openedProfile, message) {
+        throw new NeatComet.Exception('Abstract method call');
     }
 
 }, {

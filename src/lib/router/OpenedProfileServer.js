@@ -52,7 +52,10 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
         }, this);
     },
 
-    open: function() {
+    /**
+     * @private
+     */
+    _initMasterKeysForLoad: function() {
 
         _.each(this.bindings, function(binding) {
 
@@ -66,6 +69,13 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
             // WAS HERE, TEMPORARY MOVED // binding.channel.openProfile(this);
 
         }, this);
+
+    },
+
+    open: function() {
+
+        // Extracted for use in updateMasterValues tests
+        this._initMasterKeysForLoad();
 
         // Load
         return this
@@ -349,6 +359,11 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
         var paramsBeforeOperation;
         var minimalParams;
         var removed;
+
+        // Allow calls on empty master keys
+        if (_.isEmpty(addValues) && _.isEmpty(removeValues)) {
+            return;
+        }
 
         if (!noCascade) {
             paramsBeforeOperation = NeatComet.NeatCometServer.cloneRecursive(this.requestParams);

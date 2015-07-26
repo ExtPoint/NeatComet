@@ -320,7 +320,6 @@ module.exports = {
         );
     }
 
-    // TODO: test updateMasterValues
     // TODO: test channels management (addChannels, removeChannels, updateChannels, destroy)
 
 };

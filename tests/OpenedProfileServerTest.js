@@ -18,7 +18,9 @@ function initSubject(requestParams, mockProfileBindings) {
     openedProfile.connection = {
         // Mock NeatCometServer
         server: {
-            profileBindings: mockProfileBindings
+            profileBindings: mockProfileBindings,
+
+            externalDataLoader: null // Used below
         }
     };
 
@@ -140,9 +142,7 @@ module.exports = {
         );
 
         // Side effect: updateMasterValues
-        attempt.updateMasterValues = test.mockFunction('updateMasterValues',
-            ['theBinding', 'theId', {}, null, null, true]
-        );
+        attempt.updateMasterValues = test.mockFunction('updateMasterValues');
 
         // Test
         attempt.run(
@@ -185,10 +185,7 @@ module.exports = {
         );
 
         // Side effect: updateMasterValues
-        attempt.updateMasterValues = test.mockFunction('updateMasterValues',
-            ['theBinding', 'theId', {}, null, null, true],
-            ['theAnotherBinding', 'theAnotherId', {}, null, null, true]
-        );
+        attempt.updateMasterValues = test.mockFunction('updateMasterValues');
 
         // Test
         attempt.run(
@@ -298,8 +295,7 @@ module.exports = {
                         'theMasterBinding.theMasterAttribute': ['theMatchingValue', 'theMasterUnmatchingValue']
                     };
                 }
-            },
-            ['theDetailBinding', 'theDetailMatchingId', {}, null, null, true]
+            }
         );
 
 

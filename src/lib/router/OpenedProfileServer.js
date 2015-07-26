@@ -217,16 +217,18 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
             this._markBindingLoaded(binding);
 
             // Save loaded master keys
-            _.each(data[index], function(attributes) {
-                this.updateMasterValues(
-                    bindingId,
-                    binding.getIdFromAttributes(attributes),
-                    NeatComet.NeatCometServer.intersectKeys(attributes, binding.masterKeys),
-                    null,
-                    null,
-                    true // No cascade
-                );
-            }, this);
+            if (!_.isEmpty(binding.masterKeys)) {
+                _.each(data[index], function (attributes) {
+                    this.updateMasterValues(
+                        bindingId,
+                        binding.getIdFromAttributes(attributes),
+                        NeatComet.NeatCometServer.intersectKeys(attributes, binding.masterKeys),
+                        null,
+                        null,
+                        true // No cascade
+                    );
+                }, this);
+            }
 
             // Write data
             sets.loaded[bindingId] = data[index];

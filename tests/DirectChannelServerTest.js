@@ -41,10 +41,10 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
         return bindingAppliedParams;
     };
 
-    directChannelServer.binding.composeJsFilter = function(sender, params, openedProfile) {
-        test.equal(arguments.length, 3);
+    directChannelServer.binding.composeJsFilter = function(sender, openedProfile) {
+        test.equal(arguments.length, 2);
         test.ok(_.isFunction(sender));
-        test.deepEqual(params, bindingAppliedParams);
+        test.ok(true); // Align test.expect()
         test.strictEqual(openedProfile, theOpenedProfile);
 
         // Remember to test further

@@ -203,11 +203,10 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
 
     /**
      * @param {Function} sender
-     * @param {Object.<string, (string[])>} params
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @return {Function}
      */
-    composeJsFilter: function(sender, params, openedProfile) {
+    composeJsFilter: function(sender, openedProfile) {
 
         var jsText = this.where;
         var modelFilter = null;
@@ -220,7 +219,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
         // Prepare filter
         if (jsText) {
             jsText = jsText.replace(/{(\w+)}/g, function (dummy, name) {
-                return JSON.stringify(params[name]);
+                return JSON.stringify(openedProfile.requestParams[name]);
             });
             modelFilter = eval('(function(model) { return (' + jsText + ') })');
         }

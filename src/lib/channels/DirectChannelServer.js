@@ -60,7 +60,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
 
             // Compose filter, if required
             if (sender) {
-                filterAndSender = this.binding.composeJsFilter(sender, params, openedProfile);
+                filterAndSender = this.binding.composeJsFilter(sender, openedProfile);
                 result.hasJs = result.hasJs || (filterAndSender !== sender);
             }
 

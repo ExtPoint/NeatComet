@@ -72,11 +72,12 @@ function testJsFilter(test, challenge, response) {
         response ?
             test.mockFunction('sender', ['theChannel', response]) :
             test.mockFunction('sender'),
-        {
-            'theRequestParam': 'theMatchingValue'
-        },
         // openedProfile: NeatComet.router.OpenedProfileServer
-        {}
+        {
+            requestParams: {
+                'theRequestParam': 'theMatchingValue'
+            }
+        }
     );
 
     jsFilter('theChannel', challenge);
@@ -173,7 +174,6 @@ module.exports = {
 
         var jsFilter = bindingServer.composeJsFilter(
             plainSender,
-            {},
             // openedProfile: NeatComet.router.OpenedProfileServer
             {}
         );
@@ -205,7 +205,6 @@ module.exports = {
 
         var jsFilter = bindingServer.composeJsFilter(
             mockSender,
-            {},
             // openedProfile: NeatComet.router.OpenedProfileServer
             {
                 updateMasterValues: test.mockFunction('updateMasterValues',

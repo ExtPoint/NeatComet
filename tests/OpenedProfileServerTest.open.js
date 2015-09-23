@@ -1,5 +1,6 @@
 require('./bootstrap');
 var when = require('when');
+require('../src/lib/NeatCometServer'); // For intersectKeys, TODO: extract utils
 require('../src/lib/router/OpenedProfileServer');
 require('../src/lib/router/DataLoaderServer');
 

@@ -31,7 +31,7 @@ class NeatCometServer {
     protected function setupBindings() {
 
         // Apply settings
-        foreach (ConfigReader::read($this->configFileName) as $profile => $definitions) {
+        foreach (ConfigReader::readFile($this->configFileName) as $profile => $definitions) {
 
             foreach ($definitions as $id => $definition) {
 
@@ -80,12 +80,16 @@ class NeatCometServer {
     }
 
     /**
-     * @param string|string[] $profiles
+     * @param string|string[]|null $profiles
      * @return array
      */
-    public function getClientParams($profiles) {
+    public function getClientParams($profiles = null) {
 
         $result = [];
+
+        if ($profiles === null) {
+            $profiles = array_keys($this->profileBindings);
+        }
 
         foreach ((array)$profiles as $profileId) {
             foreach ($this->profileBindings[$profileId] as $bindingId => $binding) {

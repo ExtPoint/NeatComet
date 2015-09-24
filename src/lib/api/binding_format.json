@@ -40,7 +40,12 @@
 
 
                 // Server model id
-                "serverModel": "app\\modules\\cometSample\\models\\DemoRow"
+                "serverModel": "app\\modules\\cometSample\\models\\DemoRow",
+
+                // Params to pass into client side adapter, optional
+                "client": {
+
+                }
             }
         }
     }

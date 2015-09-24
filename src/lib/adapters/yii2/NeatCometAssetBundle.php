@@ -13,6 +13,7 @@ class NeatCometAssetBundle extends AssetBundle {
         'NeatCometClient.js',
         'SafeChannelClient.js',
         'SimpleCollectionMapperClient.js',
+        'router/OpenedProfileClient.js',
     ];
 
     /**

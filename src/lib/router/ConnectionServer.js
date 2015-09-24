@@ -23,9 +23,6 @@ var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object
     /** @type {Object.<string, NeatComet.router.OpenedProfileServer>} */
     _openedProfiles: null,
 
-    /** @type {number} */
-    _lastId: 0,
-
     constructor: function(connectionId) {
 
         this.connectionId = connectionId;
@@ -52,16 +49,20 @@ var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object
         var openedProfiles = [];
 
         // Open each profile
-        _.each(requestParams, function(profileRequestParams, profile) {
+        _.each(requestParams, function(profileParams) {
+
+            var openedProfileId = profileParams[0];
+            var profileId = profileParams[1];
+            var profileRequestParams = profileParams[2];
 
             // Get binding
-            var profileBindings = this.server.profileBindings[profile];
+            var profileBindings = this.server.profileBindings[profileId];
             if (!profileBindings) {
                 throw new NeatComet.Exception('Wrong profile requested');
             }
 
             // Track opened profile
-            var openedProfile = this._addOpenedProfile(profile, profileRequestParams);
+            var openedProfile = this._addOpenedProfile(openedProfileId, profileId, profileRequestParams);
             var result = openedProfile.open();
 
             if (result !== null) {
@@ -104,7 +105,6 @@ var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object
                     // Client init command
                     result[profile].push([
                         bindingId,
-                        openedProfile.bindings[bindingId].client,
                         bindingData
                     ]);
 
@@ -130,22 +130,27 @@ var self = Joints.defineClass('NeatComet.router.ConnectionServer', Joints.Object
     },
 
     /**
-     * @param {string} profile
+     * @param {Number} openedProfileId
+     * @param {string} profileId
      * @param {Object.<string, *>} requestParams
      * @returns {NeatComet.router.OpenedProfileServer}
      */
-    _addOpenedProfile: function(profile, requestParams) {
+    _addOpenedProfile: function(openedProfileId, profileId, requestParams) {
+
+        if (this._openedProfiles[openedProfileId]) {
+            throw new NeatComet.Exception('Collision in client request. Same openedProfileId twice');
+        }
 
         // Create
         var openedProfile = new NeatComet.router.OpenedProfileServer;
-        openedProfile.id = ++this._lastId;
-        openedProfile.profile = profile;
+        openedProfile.id = openedProfileId;
+        openedProfile.profile = profileId;
         openedProfile.connection = this;
         openedProfile.requestParams = requestParams;
         openedProfile.init();
 
         // Register
-        this._openedProfiles[openedProfile.id] = openedProfile;
+        this._openedProfiles[openedProfileId] = openedProfile;
 
         return openedProfile;
     },

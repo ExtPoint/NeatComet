@@ -1,8 +1,9 @@
 /**
  * @callback NeatComet.NeatCometClient~getCollection
- * @param {string} profile
+ * @param {string} profileId
  * @param {string} bindingId
- * @param {string} openedProfileId
+ * @param {*} clientParams
+ * @param {NeatComet.router.OpenedProfileClient} openedProfile
  * @returns {NeatComet.api.ICollectionClient}
  */
 
@@ -16,13 +17,16 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
     getCollection: null,
 
     /** @type {Object.<string, Object.<string, *>>} */
-    profileBindings: null,
+    clientParams: null,
 
     /** @type {Object} */
     _openedProfileParams: null,
 
-    /** @type {Object} */
+    /** @type {Object.<number, NeatComet.router.OpenedProfileClient>} */
     _openedProfiles: null,
+
+    /** @type {Object.<string, NeatComet.router.OpenedProfileClient[]>} */
+    _openedProfilesByProfileId: null,
 
     /** @type {NeatComet.SafeChannelClient} */
     _channel: null,
@@ -46,8 +50,9 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
      */
     setup: function(options) {
 
-        this._openedProfileParams = {};
+        this._openedProfileParams = [];
         this._openedProfiles = {};
+        this._openedProfilesByProfileId = {};
         if (options.getCollection) {
             this.getCollection = options.getCollection;
         }
@@ -64,67 +69,71 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
     refresh: function() {
 
         // Call server
-        if (!_.isEmpty(this._openedProfileParams)) {
+        if (this._openedProfileParams.length) {
             this._channel.sendOpen(this._openedProfileParams);
         }
     },
 
-    open: function(profiles, callback) {
+    openProfile: function(profileId, params) {
 
-        // Mark
-        _.each(profiles, function(profileParams, profileId) {
+        var openedProfileId = ++this._lastId;
 
-            this._openedProfileParams[profileId] = profileParams;
+        this._openedProfileParams.push([openedProfileId, profileId, params]);
 
-            var openedProfileId = ++this._lastId;
+        // Init openedProfile
+        var openedProfile = new NeatComet.router.OpenedProfileClient();
+        openedProfile.id = openedProfileId;
+        openedProfile.profileId = profileId;
+        openedProfile.manager = this;
+        this._openedProfiles[openedProfileId] = openedProfile;
 
-            // Init openedProfile
-            this._openedProfiles[openedProfileId] = {
-                id: openedProfileId,
-                profile: profileId,
-                collections: {}
-            };
-            if (this.profileBindings && this.profileBindings[profileId]) {
-                _.each(this.profileBindings[profileId], function(clientParams, bindingId) {
-                    this._openedProfiles[openedProfileId].collections[bindingId] =
-                        this.getCollection(profileId, bindingId, openedProfileId, clientParams);
-                }, this);
-            }
-
-            if (callback) {
-                callback(this._openedProfiles[openedProfileId], profileId, openedProfileId);
-            }
-
-        }, this);
+        if (!this._openedProfilesByProfileId[profileId]) {
+            this._openedProfilesByProfileId[profileId] = [];
+        }
+        this._openedProfilesByProfileId[profileId].push(openedProfile);
 
         // Connect
+        // TODO: optimize
         if (this._channel && this._channel.isReady) {
             this.refresh();
         }
+
+        return openedProfile;
+    },
+
+    /**
+     * @param profiles
+     * @param callback
+     * @deprecated
+     */
+    open: function(profiles, callback) {
+
+        // Mark
+        _.each(profiles, function(params, profileId) {
+
+            var openedProfile = this.openProfile(profileId, params);
+
+            if (callback) {
+                callback(openedProfile, openedProfile.profileId, openedProfile.id);
+            }
+
+        }, this);
     },
 
     _onRefreshResponse: function(profileData) {
 
         // Setup enabled bindings
-        _.each(profileData, function(profileBindings, profile) {
+        _.each(profileData, function(profileBindings, profileId) {
 
-            _.each(profileBindings, function(bindingId_clientParams_data) {
+            _.each(profileBindings, function(bindingId_data) {
 
-                var bindingId = bindingId_clientParams_data[0];
+                var bindingId = bindingId_data[0];
 
-                // TODO: tmp
-                var openedProfile = this._openedProfiles[1];
-                var collection = openedProfile.collections[bindingId];
+                _.each(this._openedProfilesByProfileId[profileId], function(openedProfile) {
 
-                // Init collection, if not preloaded
-                if (!collection) {
-                    collection = this.getCollection(openedProfile.profile, bindingId,
-                        openedProfile.id, bindingId_clientParams_data[1]);
-                    openedProfile.collections[bindingId] = collection;
-                }
-
-                // Init call
-                collection.reset(bindingId_clientParams_data[2]);
+                    // Init call
+                    openedProfile.getCollection(bindingId).reset(bindingId_data[1]);
+                }, this);
 
             }, this);
 
@@ -137,24 +146,21 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
         this._callCollections(regs[1], regs[2], data);
     },
 
-    _callCollections: function(profile, bindingId, args) {
-
-        // TODO: queue message, if collection is not ready
+    _callCollections: function(profileRef, bindingId, args) {
 
         var command = args[0];
         args = args.slice(1);
 
         function callCollection(openedProfile) {
-            var collection = openedProfile.collections[bindingId];
+            var collection = openedProfile.getCollection(bindingId);
             collection[command].apply(collection, args);
         }
 
-        if (profile.substr(0, 1) === '!') {
-            callCollection(this._openedProfiles[profile.substr(1)]);
+        if (profileRef.substr(0, 1) === '!') {
+            callCollection(this._openedProfiles[profileRef.substr(1)]);
         }
         else {
-            // TODO: filter by profile
-            _.each(this._openedProfiles, callCollection);
+            _.each(this._openedProfilesByProfileId[profileRef], callCollection);
         }
     }
 

@@ -33,7 +33,7 @@ var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @l
 
         this.externalDataLoader = options.externalDataLoader || null;
 
-        this._setupBindings(options.configFileName);
+        this._setupBindings(options.config || /* legacy */ options.configFileName);
 
         this._setupComet(options.comet);
     },
@@ -50,12 +50,21 @@ var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @l
         }
     },
 
-    _setupBindings: function(configFileName) {
+    /**
+     * @param config {Object|string} Config or config file name
+     * @private
+     */
+    _setupBindings: function(config) {
+
+        // Read config
+        if (_.isString(config)) {
+            config = NeatComet.configReader.ConfigReader.readFile(config);
+        }
 
         // Apply settings
         this.profileBindings = {};
 
-        _.each(NeatComet.configReader.ConfigReader.read(configFileName), function(bindingDefinitions, profile) {
+        _.each(config, function(bindingDefinitions, profile) {
 
             _.each(bindingDefinitions, function(definition, id) {
 

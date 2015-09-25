@@ -69,7 +69,7 @@ class ConfigReader {
      * @return array
      * @throws Exception
      */
-    public function readFile($fileName) {
+    public static function readFile($fileName) {
         $reader = new self;
         $reader->fileName = $fileName;
         return $reader->read();

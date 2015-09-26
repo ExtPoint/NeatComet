@@ -5,8 +5,9 @@ use NeatComet\api\IOrmLoader;
 use NeatComet\channels\BaseChannelServer;
 use NeatComet\Exception;
 use NeatComet\NeatCometServer;
+use NeatComet\Object;
 
-class BindingServer {
+class BindingServer extends Object {
 
     /** Id **/
 
@@ -18,6 +19,9 @@ class BindingServer {
 
 
     /** Definition **/
+
+    /** @var \StdClass */
+    public $definition;
 
     /** @var \StdClass|null */
     public $match;
@@ -47,7 +51,7 @@ class BindingServer {
     /** Components **/
 
     /** @var NeatCometServer */
-    public $neatComet;
+    public $manager;
 
     /** @var BaseChannelServer */
     public $channel;
@@ -57,16 +61,12 @@ class BindingServer {
 
 
     /**
-     * @param NeatCometServer $neatComet
-     * @param string $profile
-     * @param string $id
-     * @param \StdClass $definition
      * @throws Exception
      */
-    public function __construct($neatComet, $profile, $id, $definition) {
+    public function init() {
 
         // Assign params
-        foreach ($definition as $key => $value) {
+        foreach ($this->definition as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->{$key} = $value;
             }
@@ -85,13 +85,9 @@ class BindingServer {
             }
         }
 
-        $this->neatComet = $neatComet;
-        $this->profile = $profile;
-        $this->id = $id;
-        $this->definition = $definition;
-
         $this->channel = BaseChannelServer::create($this->routeMode);
         $this->channel->binding = $this;
+        $this->channel->init();
     }
 
     /**
@@ -127,7 +123,7 @@ class BindingServer {
 
         if (isset($this->whereSql)) {
 
-            $data = $this->neatComet->ormLoader->loadRecords(
+            $data = $this->manager->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_SQL,
@@ -138,7 +134,7 @@ class BindingServer {
 
         elseif (isset($this->where)) {
 
-            $data = $this->neatComet->ormLoader->loadRecords(
+            $data = $this->manager->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_JS,
@@ -148,7 +144,7 @@ class BindingServer {
         }
 
         else {
-            $data = $this->neatComet->ormLoader->loadRecords(
+            $data = $this->manager->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_NONE,

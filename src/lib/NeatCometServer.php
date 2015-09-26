@@ -6,7 +6,7 @@ use NeatComet\api\IOrmLoader;
 use NeatComet\bindings\BindingServer;
 use NeatComet\configReader\ConfigReader;
 
-class NeatCometServer {
+class NeatCometServer extends Object {
 
     /** @var string */
     public $configFileName;
@@ -36,7 +36,12 @@ class NeatCometServer {
             foreach ($definitions as $id => $definition) {
 
                 // Create handler
-                $binding = new BindingServer($this, $profile, $id, $definition);
+                $binding = new BindingServer;
+                $binding->manager = $this;
+                $binding->profile = $profile;
+                $binding->id = $id;
+                $binding->definition = $definition;
+                $binding->init();
 
                 // Store
                 $this->profileBindings[$profile][$id] = $binding;

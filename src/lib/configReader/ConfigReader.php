@@ -2,8 +2,9 @@
 namespace NeatComet\configReader;
 
 use NeatComet\Exception;
+use NeatComet\Object;
 
-class ConfigReader {
+class ConfigReader extends Object {
 
     /** @var string */
     public $fileName;
@@ -72,6 +73,7 @@ class ConfigReader {
     public static function readFile($fileName) {
         $reader = new self;
         $reader->fileName = $fileName;
+        $reader->init();
         return $reader->read();
     }
 

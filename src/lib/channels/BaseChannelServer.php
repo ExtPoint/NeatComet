@@ -4,8 +4,9 @@ namespace NeatComet\channels;
 
 use NeatComet\bindings\BindingServer;
 use NeatComet\Exception;
+use NeatComet\Object;
 
-abstract class BaseChannelServer {
+abstract class BaseChannelServer extends  Object {
 
     /** @var BindingServer */
     public $binding;
@@ -25,8 +26,8 @@ abstract class BaseChannelServer {
 
         switch ($routeMode) {
             case null: // Direct is default
-            case 'direct': return new DirectChannelServer();
-            case 'merged': return new MergedChannelServer();
+            case 'direct': return new DirectChannelServer;
+            case 'merged': return new MergedChannelServer;
             default: throw new Exception('Unknown routeMode: ' . $routeMode);
         }
     }

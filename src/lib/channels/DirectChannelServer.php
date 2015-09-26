@@ -127,7 +127,7 @@ class DirectChannelServer extends BaseChannelServer {
 
     private function push($channel, $args) {
 
-        $this->binding->neatComet->comet->broadcast(
+        $this->binding->manager->comet->broadcast(
             // TODO: Decide what should be channel like
             $this->binding->profile . ':' . $this->binding->id . ':' . $channel,
             $args

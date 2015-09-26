@@ -89,6 +89,7 @@ var self = NeatComet.configReader.ConfigReader = NeatComet.Object.extend(/** @le
     readFile: function(fileName) {
         var reader = new self;
         reader.fileName = fileName;
+        reader.init();
         return reader.read();
     }
 });

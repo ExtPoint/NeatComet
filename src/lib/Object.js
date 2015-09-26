@@ -18,6 +18,8 @@
  * x.init();
  *
  * @class NeatComet.Object
+ *
+ * @param {Object.<string, *>} [config]
  */
 NeatComet.Object = function(config) {
 

@@ -95,15 +95,15 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
              */
             function(openedProfile, index) {
 
-                var profile = openedProfile.profile;
-                if (!result[profile]) {
-                    result[profile] = [];
+                var profileId = openedProfile.profileId;
+                if (!result[profileId]) {
+                    result[profileId] = [];
                 }
 
                 _.each(data[index], function(bindingData, bindingId) {
 
                     // Client init command
-                    result[profile].push([
+                    result[profileId].push([
                         bindingId,
                         bindingData
                     ]);
@@ -144,7 +144,7 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
         // Create
         var openedProfile = new NeatComet.router.OpenedProfileServer;
         openedProfile.id = openedProfileId;
-        openedProfile.profile = profileId;
+        openedProfile.profileId = profileId;
         openedProfile.connection = this;
         openedProfile.requestParams = requestParams;
         openedProfile.init();
@@ -158,7 +158,7 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
     removeOpenedProfile: function(id) {
 
         // Check API sanity
-        if (this._openedProfiles[id].profile) {
+        if (this._openedProfiles[id].profileId) {
             throw new NeatComet.Exception("Call OpenedProfileServer.destroy() to close profile");
         }
 

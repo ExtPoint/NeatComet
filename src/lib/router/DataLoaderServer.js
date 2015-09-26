@@ -26,7 +26,7 @@ var self = NeatComet.router.DataLoaderServer = NeatComet.Object.extend(/** @lend
     manager: null,
 
     /** @type {string} */
-    profile: null,
+    profileId: null,
 
     /** @type {Array} */
     _batchParams: null,
@@ -46,11 +46,11 @@ var self = NeatComet.router.DataLoaderServer = NeatComet.Object.extend(/** @lend
 
         // Start local query immediately
         if (!this.manager.externalDataLoader) {
-            this._promises.push(this.manager.profileBindings[this.profile][bindingId].loadDataLocally(params));
+            this._promises.push(this.manager.profileBindings[this.profileId][bindingId].loadDataLocally(params));
         }
         // Or prepare external
         else {
-            this._batchParams.push([this.profile, bindingId, params]);
+            this._batchParams.push([this.profileId, bindingId, params]);
         }
 
         // Save association

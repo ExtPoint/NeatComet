@@ -129,7 +129,7 @@ class DirectChannelServer extends BaseChannelServer {
 
         $this->binding->manager->comet->broadcast(
             // TODO: Decide what should be channel like
-            $this->binding->profile . ':' . $this->binding->id . ':' . $channel,
+            $this->binding->profileId . ':' . $this->binding->id . ':' . $channel,
             $args
         );
     }

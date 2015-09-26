@@ -10,7 +10,7 @@ function initSubject() {
     // Stub
     directChannelSever.binding = {
         id: 'theBinding',
-        profile: 'theProfile',
+        profileId: 'theProfile',
         match: null,
         channelTemplate: null
     };

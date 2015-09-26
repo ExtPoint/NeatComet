@@ -31,20 +31,20 @@ class NeatCometServer extends Object {
     protected function setupBindings() {
 
         // Apply settings
-        foreach (ConfigReader::readFile($this->configFileName) as $profile => $definitions) {
+        foreach (ConfigReader::readFile($this->configFileName) as $profileId => $definitions) {
 
             foreach ($definitions as $id => $definition) {
 
                 // Create handler
                 $binding = new BindingServer;
                 $binding->manager = $this;
-                $binding->profile = $profile;
+                $binding->profileId = $profileId;
                 $binding->id = $id;
                 $binding->definition = $definition;
                 $binding->init();
 
                 // Store
-                $this->profileBindings[$profile][$id] = $binding;
+                $this->profileBindings[$profileId][$id] = $binding;
                 $this->modelBindings[$definition->serverModel][] = $binding;
             }
         }
@@ -77,8 +77,8 @@ class NeatCometServer extends Object {
         $result = [];
 
         foreach ($list as $entry) {
-            list($profile, $bindingId, $request) = $entry;
-            $result[] = $this->profileBindings[$profile][$bindingId]->loadDataLocally($request);
+            list($profileId, $bindingId, $request) = $entry;
+            $result[] = $this->profileBindings[$profileId][$bindingId]->loadDataLocally($request);
         }
 
         return $result;

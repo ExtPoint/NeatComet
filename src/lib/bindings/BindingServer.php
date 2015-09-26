@@ -12,7 +12,7 @@ class BindingServer extends Object {
     /** Id **/
 
     /** @var string */
-    public $profile;
+    public $profileId;
 
     /** @var string */
     public $id;

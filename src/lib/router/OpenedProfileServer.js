@@ -17,7 +17,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     id: null,
 
     /** @type {string} */
-    profile: null,
+    profileId: null,
 
     /** @type {Object.<string, NeatComet.bindings.BindingServer>} */
     bindings: null,
@@ -42,7 +42,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
     init: function() {
         
-        this.bindings = this.connection.manager.profileBindings[this.profile];
+        this.bindings = this.connection.manager.profileBindings[this.profileId];
 
         // Init master values
         _.each(this.bindings, function(binding) {
@@ -87,7 +87,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
             .then(_.bind(function(result) {
 
                 // Skip, if profile was closed during DB call
-                if (this.profile) {
+                if (this.profileId) {
 
                     // Attach channels, before load data
                     _.each(this.bindings, function(binding) {
@@ -161,7 +161,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                    return this._loadNext(sets);
                 }
 
-                throw new NeatComet.Exception('Cycle links in bindings of "' + this.profile + '" profile');
+                throw new NeatComet.Exception('Cycle links in bindings of "' + this.profileId + '" profile');
             }
 
             return when.resolve(sets.loaded);
@@ -205,7 +205,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     _handleLoaded: function(sets, bindingIds, data) {
 
         // Stop, if profile was closed during DB call
-        if (!this.profile) {
+        if (!this.profileId) {
             return null;
         }
 
@@ -247,7 +247,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         // Create data loader
         var dataLoader = new NeatComet.router.DataLoaderServer;
         dataLoader.manager = this.connection.manager;
-        dataLoader.profile = this.profile;
+        dataLoader.profileId = this.profileId;
         dataLoader.init();
 
         return dataLoader;
@@ -259,7 +259,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         this.removeChannels(this._channelFilters);
 
         // Mark ready to remove
-        this.profile = null;
+        this.profileId = null;
 
         // Unlink
         this.connection.removeOpenedProfile(this.id);

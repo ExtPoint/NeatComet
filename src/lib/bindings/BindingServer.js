@@ -13,7 +13,7 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** Id **/
 
     /** @type {string} */
-    profile: null,
+    profileId: null,
 
     /** @type {string} */
     id: null,

@@ -13,7 +13,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
     channelPrefix: '',
 
     init: function() {
-        this.channelPrefix = this.binding.profile + ':' + this.binding.id + ':';
+        this.channelPrefix = this.binding.profileId + ':' + this.binding.id + ':';
     },
 
     _iterateParams: function(result, params, restParams, sender, openedProfile, getChannelFn) {

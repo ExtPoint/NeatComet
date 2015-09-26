@@ -65,21 +65,21 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
         // Apply settings
         this.profileBindings = {};
 
-        _.each(config, function(bindingDefinitions, profile) {
+        _.each(config, function(bindingDefinitions, profileId) {
 
             _.each(bindingDefinitions, function(definition, id) {
 
                 var binding = new NeatComet.bindings.BindingServer({
                     manager: this,
-                    profile: profile,
+                    profileId: profileId,
                     id: id,
                     definition: definition
                 });
 
-                if (!this.profileBindings[profile]) {
-                    this.profileBindings[profile] = {};
+                if (!this.profileBindings[profileId]) {
+                    this.profileBindings[profileId] = {};
                 }
-                this.profileBindings[profile][id] = binding;
+                this.profileBindings[profileId][id] = binding;
 
             }, this);
 

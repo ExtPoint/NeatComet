@@ -125,10 +125,10 @@
      */
     NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter.wrap = function(collectionMapper, idMapper) {
 
-        return function(profile, bindingId, openedProfileId) {
+        return function(profileId, bindingId, openedProfileId) {
 
             return new NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter({
-                collection: collectionMapper.get(profile, bindingId),
+                collection: collectionMapper.get(profileId, bindingId),
                 idMapper: idMapper
             });
         };

@@ -43,18 +43,18 @@ TestingKit.prototype = {
         }, properties);
     },
 
-    _init: function(profile) {
+    _init: function(profileDefinition) {
 
         var openedProfileServer = new NeatComet.router.OpenedProfileServer();
         openedProfileServer.id = 123;
-        openedProfileServer.profile = 'theProfile';
+        openedProfileServer.profileId = 'theProfile';
 
         // Mock ConnectionServer
         openedProfileServer.connection = {
             // Mock NeatCometServer
             manager: {
                 profileBindings: {
-                    'theProfile': profile
+                    'theProfile': profileDefinition
                 },
 
                 externalDataLoader: { /* Define below */ }
@@ -73,10 +73,10 @@ TestingKit.prototype = {
         this.openedProfileServer = openedProfileServer;
     },
 
-    run: function(profile, expectedResult) {
+    run: function(profileDefinition, expectedResult) {
 
         // Init
-        this._init(profile);
+        this._init(profileDefinition);
 
 
         // Test

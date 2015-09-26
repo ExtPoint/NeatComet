@@ -11,7 +11,7 @@ function initSubject(requestParams, mockProfileBindings) {
 
     var openedProfile = new NeatComet.router.OpenedProfileServer();
     openedProfile.id = 123;
-    openedProfile.profile = 'theProfile';
+    openedProfile.profileId = 'theProfile';
 
     // Mock ConnectionServer
     openedProfile.connection = {

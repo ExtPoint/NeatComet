@@ -1,6 +1,7 @@
 require('./bootstrap');
 require('../src/lib/NeatCometServer'); // For intersectKeys, TODO: extract utils
 require('../src/lib/bindings/BindingServer');
+require('../src/lib/channels/BaseChannelServer');
 
 /**
  * @param {Object} definition
@@ -9,19 +10,18 @@ require('../src/lib/bindings/BindingServer');
 function initSubject(definition) {
 
     // Mock
-    Joints.namespace('NeatComet.channels.BaseChannelServer');
     NeatComet.channels.BaseChannelServer.create = function() {
         return {
             init: function() {}
         };
     };
 
-    return new NeatComet.bindings.BindingServer(
-        {},
-        'theProfile',
-        'theBinding',
-        definition
-    );
+    return new NeatComet.bindings.BindingServer({
+        neatComet: {},
+        profile: 'theProfile',
+        id: 'theBinding',
+        definition: definition
+    });
 }
 
 /**

@@ -29,7 +29,7 @@ NeatComet.api.ICometServerEvents.prototype = {
     /**
      * @param {String} connectionId
      * @param {*} params
-     * @return {Promise} for response {*}
+     * @returns {Promise} for response {*}
      */
     onOpenProfileCommand: function(connectionId, params) {
 

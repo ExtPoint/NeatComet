@@ -6,9 +6,9 @@
 
 /**
  * @class NeatComet.router.OpenedProfileClient
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-Joints.defineClass('NeatComet.router.OpenedProfileClient', Joints.Object, /** @lends NeatComet.router.OpenedProfileServer.prototype */{
+NeatComet.router.OpenedProfileClient = NeatComet.Object.extend(/** @lends NeatComet.router.OpenedProfileServer.prototype */{
 
     /** @type {Number} */
     id: null,
@@ -22,7 +22,7 @@ Joints.defineClass('NeatComet.router.OpenedProfileClient', Joints.Object, /** @l
     /** @type {Object.<string, NeatComet.api.ICollectionClient>} */
     collections: null,
 
-    constructor: function() {
+    init: function() {
         this.collections = {};
     },
 

@@ -5,10 +5,7 @@
  */
 (function() {
 
-    /**
-     * @namespace NeatComet.adapters.backbone
-     */
-    NeatComet.adapters || (NeatComet.adapters = {});
+    /** @namespace NeatComet.adapters.backbone */
     NeatComet.adapters.backbone || (NeatComet.adapters.backbone = {});
 
     /**

@@ -6,23 +6,21 @@
 
 /**
  * @class NeatComet.Exception
- * @extends Joints.Object
  */
-Joints.defineClass('NeatComet.Exception', Joints.Object, /** @lends NeatComet.Exception.prototype */{
+NeatComet.Exception = function(msg) {
 
-	msg: null,
+    this.msg = msg;
+};
 
-	constructor: function(msg) {
+NeatComet.Exception.prototype = {
 
-		this._super();
+    msg: null
 
-		this.msg = msg;
-	}
+};
 
-}, {
-    warning: function(msg) {
-        if (typeof console !== 'undefined') {
-            console.error("NeatComet warning: " + msg);
-        }
+NeatComet.Exception.warning = function(msg) {
+
+    if (typeof console !== 'undefined') {
+        console.error("NeatComet warning: " + msg);
     }
-});
+};

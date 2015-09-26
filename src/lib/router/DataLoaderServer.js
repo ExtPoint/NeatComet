@@ -7,19 +7,20 @@ var when = require('when');
 
 /**
  * @class NeatComet.router.DataLoaderServer
+ * @extends NeatComet.Object
  *
  * @param {Object.<string, Array>} requestParams
  * @param {?function} [externalDataLoader]
  * @returns {NeatComet.router.DataLoaderServer}
  */
-NeatComet.router.DataLoaderServer = function(requestParams, externalDataLoader) {
+var self = NeatComet.router.DataLoaderServer = NeatComet.Object.extend(/** @lends NeatComet.router.DataLoaderServer.prototype */ {
 
-    this._batchParams = [];
-    this._promises = [];
-    this.associations = [];
-};
+    init: function() {
 
-NeatComet.router.DataLoaderServer.prototype = {
+        this._batchParams = [];
+        this._promises = [];
+        this.associations = [];
+    },
 
     /** @type {NeatComet.NeatCometServer} */
     neatComet: null,
@@ -71,4 +72,4 @@ NeatComet.router.DataLoaderServer.prototype = {
             return when.all(this._promises);
         }
     }
-};
+});

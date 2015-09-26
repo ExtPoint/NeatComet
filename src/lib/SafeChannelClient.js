@@ -6,9 +6,9 @@
 
 /**
  * @class NeatComet.SafeChannelClient
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, /** @lends NeatComet.SafeChannelClient.prototype */{
+NeatComet.SafeChannelClient = NeatComet.Object.extend(/** @lends NeatComet.SafeChannelClient.prototype */{
 
 	/** @type {NeatComet.api.ICometClient} */
 	comet: null,
@@ -24,31 +24,17 @@ Joints.defineClass('NeatComet.SafeChannelClient', Joints.Object, /** @lends Neat
 
 	isReady: false,
 
-	_listenerInstalled: false,
-
 	_lastInitId: 0,
 	_waitingFor: 1, // Lock initially. Null = not waiting
 	_messageQueue: [],
 
-	/**
-	 *
-	 * @param {Object} options
-	 */
-	constructor: function(options) {
+	init: function() {
 
-		this._super();
-
-		_.extend(this, options);
-
-        // TODO: prettify
 		// Install comet listeners
-		if (!this._listenerInstalled) {
-			this.comet.bindEvents({
-                onConnectionRestore: _.bind(this._onCometConnectionRestore, this),
-                onMessage: _.bind(this._onCometMessage, this)
-            });
-			this._listenerInstalled = true;
-		}
+        this.comet.bindEvents({
+            onConnectionRestore: _.bind(this._onCometConnectionRestore, this),
+            onMessage: _.bind(this._onCometMessage, this)
+        });
 	},
 
 	_onCometConnectionRestore: function() {

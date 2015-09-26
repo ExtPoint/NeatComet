@@ -4,12 +4,15 @@
  * @license MIT
  */
 
+/** @namespace NeatComet.adapters.jii */
+NeatComet.adapters.jii || (NeatComet.adapters.jii = {});
+
 /**
  * @class NeatComet.adapters.jii.JiiCometServerMultiProcess
- * @extends Joints.Object
+ * @extends NeatComet.Object
  * @implements NeatComet.api.ICometServer
  */
-var self = Joints.defineClass('NeatComet.adapters.jii.JiiCometServerMultiProcess', Joints.Object, {
+var self = NeatComet.adapters.jii.JiiCometServerMultiProcess = NeatComet.Object.extend(/** @lends NeatComet.adapters.jii.JiiCometServerMultiProcess.prototype */ {
 
     /** @type {Jii.components.comet.BaseCometServer} */
     comet: null,
@@ -149,7 +152,7 @@ var self = Joints.defineClass('NeatComet.adapters.jii.JiiCometServerMultiProcess
     },
 
     /**
-     * @return {boolean}
+     * @returns {boolean}
      */
     getSupportsForwardToClient: function() {
         // TODO: Implement

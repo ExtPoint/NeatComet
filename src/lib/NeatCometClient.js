@@ -9,9 +9,12 @@
 
 /**
  * @class NeatComet.NeatCometClient
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatComet.NeatCometClient.prototype */{
+NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCometClient.prototype */{
+
+    /** @type {NeatComet.api.ICometClient} */
+    comet: null,
 
     /** @type {NeatComet.NeatCometClient~getCollection} */
     getCollection: null,
@@ -34,32 +37,15 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
     /** @type {number} */
     _lastId: 0,
 
-    constructor: function(options) {
-
-        this._super();
-
-        // Fast start
-        if (options) {
-            this.setup(options);
-        }
-    },
-
-    /**
-     *
-     * @param {Object} options
-     */
-    setup: function(options) {
+    init: function() {
 
         this._openedProfileParams = [];
         this._openedProfiles = {};
         this._openedProfilesByProfileId = {};
-        if (options.getCollection) {
-            this.getCollection = options.getCollection;
-        }
 
         // Setup channel
         this._channel = new NeatComet.SafeChannelClient({
-            comet: options.comet,
+            comet: this.comet,
             onConnectionRestore: _.bind(this.refresh, this),
             onInit: _.bind(this._onRefreshResponse, this),
             onMessage: _.bind(this._onChannelMessage, this)
@@ -85,6 +71,7 @@ Joints.defineClass('NeatComet.NeatCometClient', Joints.Object, /** @lends NeatCo
         openedProfile.id = openedProfileId;
         openedProfile.profileId = profileId;
         openedProfile.manager = this;
+        openedProfile.init();
         this._openedProfiles[openedProfileId] = openedProfile;
 
         if (!this._openedProfilesByProfileId[profileId]) {

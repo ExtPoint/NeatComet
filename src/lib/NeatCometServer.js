@@ -10,9 +10,9 @@ var path = require('path');
 
 /**
  * @class NeatComet.NeatCometServer
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @lends NeatComet.NeatCometServer.prototype */{
+var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatComet.NeatCometServer.prototype */{
 
     /** @type {Object.<string, Object.<string, NeatComet.bindings.BindingServer>>} */
     profileBindings: null,
@@ -46,6 +46,7 @@ var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @l
         if (NeatComet.router) {
             this.routeServer = new NeatComet.router.RouteServer();
             this.routeServer.server = this;
+            this.routeServer.init();
             comet.bindServerEvents(this.routeServer);
         }
     },
@@ -68,7 +69,12 @@ var self = Joints.defineClass('NeatComet.NeatCometServer', Joints.Object, /** @l
 
             _.each(bindingDefinitions, function(definition, id) {
 
-                var binding = new NeatComet.bindings.BindingServer(this, profile, id, definition);
+                var binding = new NeatComet.bindings.BindingServer({
+                    neatComet: this,
+                    profile: profile,
+                    id: id,
+                    definition: definition
+                });
 
                 if (!this.profileBindings[profile]) {
                     this.profileBindings[profile] = {};

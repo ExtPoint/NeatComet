@@ -6,9 +6,9 @@
 
 /**
  * @class NeatComet.SimpleCollectionMapperClient
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-Joints.defineClass('NeatComet.SimpleCollectionMapperClient', Joints.Object, /** @lends NeatComet.SimpleCollectionMapperClient.prototype */{
+NeatComet.SimpleCollectionMapperClient = NeatComet.Object.extend(/** @lends NeatComet.SimpleCollectionMapperClient.prototype */{
 
     /** @type {function} */
     createCollection: null,
@@ -16,20 +16,10 @@ Joints.defineClass('NeatComet.SimpleCollectionMapperClient', Joints.Object, /** 
     /** @type {object} */
     data: {},
 
-    constructor: function(options) {
-
-        this._super();
-
-        // Fast start
-        if (options) {
-            _.extend(this, options);
-        }
-    },
-
     /**
      * @param {string} profileId
      * @param {string} bindingId
-     * @return {object}
+     * @returns {object}
      */
     get: function(profileId, bindingId) {
 

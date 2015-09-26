@@ -9,6 +9,8 @@ class NeatCometAssetBundle extends AssetBundle {
     public $sourcePath = \NeatComet\LIB_PATH;
 
     public $js = [
+        'clientBase.js',
+        'Object.js',
         'Exception.js',
         'NeatCometClient.js',
         'SafeChannelClient.js',

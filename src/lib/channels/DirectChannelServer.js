@@ -8,7 +8,7 @@
  * @class NeatComet.channels.DirectChannelServer
  * @extends NeatComet.channels.BaseChannelServer
  */
-var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatComet.channels.BaseChannelServer, /** @lends NeatComet.channels.DirectChannelServer.prototype */{
+var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChannelServer.extend(/** @lends NeatComet.channels.DirectChannelServer.prototype */{
 
     channelPrefix: '',
 
@@ -192,7 +192,7 @@ var self = Joints.defineClass('NeatComet.channels.DirectChannelServer', NeatCome
      *
      * @param {NeatComet.router.ConnectionServer} connection
      * @param {string} clientChannel
-     * @return {Function}
+     * @returns {Function}
      * @private
      */
     _createPusher: function(connection, clientChannel) {

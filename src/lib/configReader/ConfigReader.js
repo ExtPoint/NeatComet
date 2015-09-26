@@ -9,9 +9,9 @@ var path = require('path');
 
 /**
  * @class NeatComet.configReader.ConfigReader
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-var self = Joints.defineClass('NeatComet.configReader.ConfigReader', Joints.Object, /** @lends NeatComet.configReader.ConfigReader.prototype */{
+var self = NeatComet.configReader.ConfigReader = NeatComet.Object.extend(/** @lends NeatComet.configReader.ConfigReader.prototype */{
 
     /** @type {String} */
     fileName: null,

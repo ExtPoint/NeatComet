@@ -6,9 +6,9 @@
 
 /**
  * @class NeatComet.bindings.BindingServer
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object, /** @lends NeatComet.bindings.BindingServer.prototype */{
+var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends NeatComet.bindings.BindingServer.prototype */{
 
     /** Id **/
 
@@ -20,6 +20,9 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
 
 
     /** Definition **/
+
+    /** @type {Object.<string, *>} */
+    definition: null,
 
     /** @type {Object.<string, *>|null} */
     match: null,
@@ -55,9 +58,10 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
     masterKeys: null,
 
 
-    constructor: function(neatComet, profile, id, definition) {
+    init: function() {
 
-        _.assign(this, definition);
+        // Expand definition
+        _.assign(this, this.definition);
 
         // Expand shortcuts
         if (_.isArray(this.match)) {
@@ -74,10 +78,6 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
             }
         }
 
-        this.neatComet = neatComet;
-        this.profile = profile;
-        this.id = id;
-        this.definition = definition;
         this.masterKeys = {};
 
         this.channel = NeatComet.channels.BaseChannelServer.create(this.routeMode);
@@ -112,7 +112,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
 
     /**
      * @param {Object.<string, *>} attributes
-     * @return {string}
+     * @returns {string}
      */
     getIdFromAttributes: function(attributes) {
         // TODO: allow override from config. Support composite keys
@@ -204,7 +204,7 @@ var self = Joints.defineClass('NeatComet.bindings.BindingServer', Joints.Object,
     /**
      * @param {Function} sender
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
-     * @return {Function}
+     * @returns {Function}
      */
     composeJsFilter: function(sender, openedProfile) {
 

@@ -9,9 +9,9 @@ var UNINITIALIZED_PARAM = {};
 
 /**
  * @class NeatComet.router.OpenedProfileServer
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Object, /** @lends NeatComet.router.OpenedProfileServer.prototype */{
+var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @lends NeatComet.router.OpenedProfileServer.prototype */{
 
     /** @type {number} */
     id: null,
@@ -245,9 +245,10 @@ var self = Joints.defineClass('NeatComet.router.OpenedProfileServer', Joints.Obj
     _createDataLoader: function() {
 
         // Create data loader
-        var dataLoader = new NeatComet.router.DataLoaderServer();
+        var dataLoader = new NeatComet.router.DataLoaderServer;
         dataLoader.neatComet = this.connection.server;
         dataLoader.profile = this.profile;
+        dataLoader.init();
 
         return dataLoader;
     },

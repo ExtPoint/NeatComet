@@ -7,10 +7,10 @@ var when = require('when');
 
 /**
  * @class NeatComet.router.RouteServer
- * @extends Joints.Object
+ * @extends NeatComet.Object
  * @implements NeatComet.api.ICometServerEvents
  */
-var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, /** @lends NeatComet.router.RouteServer.prototype */{
+var self = NeatComet.router.RouteServer = NeatComet.Object.extend(/** @lends NeatComet.router.RouteServer.prototype */{
 
     /** @type {NeatComet.NeatCometServer} */
     server: null,
@@ -18,7 +18,7 @@ var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, /**
     /** @type {Object.<string, NeatComet.router.ConnectionServer>} */
     _connections: null,
 
-    constructor: function() {
+    init: function() {
 
         this._connections = {};
     },
@@ -34,10 +34,11 @@ var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, /**
         }
         else {
             // Init
-            var connection = new NeatComet.router.ConnectionServer();
+            var connection = new NeatComet.router.ConnectionServer;
             connection.connectionId = connectionId;
             connection.comet = this.server.comet;
             connection.server = this.server;
+            connection.init();
 
             // List
             this._connections[connectionId] = connection;
@@ -65,7 +66,7 @@ var self = Joints.defineClass('NeatComet.router.RouteServer', Joints.Object, /**
     /**
      * @param {String} connectionId
      * @param {*} requestParams
-     * @return {Promise} for response {*}
+     * @returns {Promise} for response {*}
      */
     onOpenProfileCommand: function(connectionId, requestParams) {
 

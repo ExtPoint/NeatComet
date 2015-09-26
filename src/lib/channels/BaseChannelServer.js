@@ -16,9 +16,9 @@
 
 /**
  * @class NeatComet.channels.BaseChannelServer
- * @extends Joints.Object
+ * @extends NeatComet.Object
  */
-var self = Joints.defineClass('NeatComet.channels.BaseChannelServer', Joints.Object, /** @lends NeatComet.channels.BaseChannelServer.prototype */{
+var self = NeatComet.channels.BaseChannelServer = NeatComet.Object.extend(/** @lends NeatComet.channels.BaseChannelServer.prototype */{
 
     /** @type {NeatComet.bindings.BindingServer} */
     binding: null,
@@ -43,20 +43,19 @@ var self = Joints.defineClass('NeatComet.channels.BaseChannelServer', Joints.Obj
         throw new NeatComet.Exception('Abstract method call');
     }
 
-}, {
+}, /** @lends NeatComet.channels.BaseChannelServer */{
 
     /**
-     *
      * @param {string} routeMode
-     * @return {NeatComet.channels.BaseChannelServer}
+     * @returns {NeatComet.channels.BaseChannelServer}
      */
     create: function(routeMode) {
 
         switch (routeMode) {
             case null: // Direct is default
-            case 'direct': return new NeatComet.channels.DirectChannelServer();
-            case 'merged': return new NeatComet.channels.DirectChannelServer();
-            default: throw new NeatComet.Exception('Unknown routeMode: ' . $routeMode);
+            case 'direct': return new NeatComet.channels.DirectChannelServer;
+            case 'merged': return new NeatComet.channels.DirectChannelServer;
+            default: throw new NeatComet.Exception('Unknown routeMode: ' + routeMode);
         }
     }
 });

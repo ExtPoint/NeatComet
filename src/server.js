@@ -1,3 +1,5 @@
+require('./lib/serverBase');
+require('./lib/Object');
 require('./lib/Exception');
 require('./lib/NeatCometServer');
 require('./lib/bindings/BindingServer');

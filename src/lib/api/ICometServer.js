@@ -62,7 +62,7 @@ NeatComet.api.ICometServer.prototype = {
     // III. Direct forward part
 
     /**
-     * @return {boolean}
+     * @returns {boolean}
      */
     getSupportsForwardToClient: function() {
 

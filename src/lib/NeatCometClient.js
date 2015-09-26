@@ -60,11 +60,17 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         }
     },
 
+    /**
+     *
+     * @param {string} profileId
+     * @param {object} [params]
+     * @returns {NeatComet.router.OpenedProfileClient}
+     */
     openProfile: function(profileId, params) {
 
         var openedProfileId = ++this._lastId;
 
-        this._openedProfileParams.push([openedProfileId, profileId, params]);
+        this._openedProfileParams.push([openedProfileId, profileId, params || {}]);
 
         // Init openedProfile
         var openedProfile = new NeatComet.router.OpenedProfileClient();

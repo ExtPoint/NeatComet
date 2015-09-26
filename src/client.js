@@ -1,6 +1,4 @@
-throw "This was not tested yet";
-
-require('./lib/clientBase');
+require('./lib/clientBaseBrowserify');
 require('./lib/Object');
 require('./lib/Exception');
 require('./lib/NeatCometClient');

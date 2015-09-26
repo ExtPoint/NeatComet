@@ -1,5 +1,5 @@
 {
-  "name": "NeatComet",
+  "name": "neatcomet",
   "version": "0.2.1",
   "description": "Language-agnostic Meteor-style model synchronization layer for comet applications",
   "main": "src/server.js",

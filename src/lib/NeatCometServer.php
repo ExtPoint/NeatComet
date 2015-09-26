@@ -37,7 +37,8 @@ class NeatCometServer extends Object {
 
                 // Create handler
                 $binding = new BindingServer;
-                $binding->manager = $this;
+                $binding->ormLoader = $this->ormLoader;
+                $binding->comet = $this->comet;
                 $binding->profileId = $profileId;
                 $binding->id = $id;
                 $binding->definition = $definition;

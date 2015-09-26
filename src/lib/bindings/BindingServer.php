@@ -1,10 +1,10 @@
 <?php
 namespace NeatComet\bindings;
 
+use NeatComet\api\ICometClient;
 use NeatComet\api\IOrmLoader;
 use NeatComet\channels\BaseChannelServer;
 use NeatComet\Exception;
-use NeatComet\NeatCometServer;
 use NeatComet\Object;
 
 class BindingServer extends Object {
@@ -50,8 +50,11 @@ class BindingServer extends Object {
 
     /** Components **/
 
-    /** @var NeatCometServer */
-    public $manager;
+    /** @var IOrmLoader */
+    public $ormLoader;
+
+    /** @var ICometClient */
+    public $comet;
 
     /** @var BaseChannelServer */
     public $channel;
@@ -86,6 +89,7 @@ class BindingServer extends Object {
         }
 
         $this->channel = BaseChannelServer::create($this->routeMode);
+        $this->channel->comet = $this->comet;
         $this->channel->binding = $this;
         $this->channel->init();
     }
@@ -123,7 +127,7 @@ class BindingServer extends Object {
 
         if (isset($this->whereSql)) {
 
-            $data = $this->manager->ormLoader->loadRecords(
+            $data = $this->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_SQL,
@@ -134,7 +138,7 @@ class BindingServer extends Object {
 
         elseif (isset($this->where)) {
 
-            $data = $this->manager->ormLoader->loadRecords(
+            $data = $this->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_JS,
@@ -144,7 +148,7 @@ class BindingServer extends Object {
         }
 
         else {
-            $data = $this->manager->ormLoader->loadRecords(
+            $data = $this->ormLoader->loadRecords(
                 $this->serverModel,
                 $match,
                 IOrmLoader::WHERE_NONE,

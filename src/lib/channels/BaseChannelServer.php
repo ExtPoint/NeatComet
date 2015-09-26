@@ -2,14 +2,18 @@
 
 namespace NeatComet\channels;
 
+use NeatComet\api\ICometClient;
 use NeatComet\bindings\BindingServer;
 use NeatComet\Exception;
 use NeatComet\Object;
 
-abstract class BaseChannelServer extends  Object {
+abstract class BaseChannelServer extends Object {
 
     /** @var BindingServer */
     public $binding;
+
+    /** @var ICometClient */
+    public $comet;
 
     abstract public function sendAdd($attributeValues);
 

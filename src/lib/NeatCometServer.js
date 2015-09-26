@@ -70,7 +70,6 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
             _.each(bindingDefinitions, function(definition, id) {
 
                 var binding = new NeatComet.bindings.BindingServer({
-                    manager: this,
                     profileId: profileId,
                     id: id,
                     definition: definition

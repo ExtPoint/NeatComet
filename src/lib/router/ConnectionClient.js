@@ -5,10 +5,10 @@
  */
 
 /**
- * @class NeatComet.SafeChannelClient
+ * @class NeatComet.router.ConnectionClient
  * @extends NeatComet.Object
  */
-NeatComet.SafeChannelClient = NeatComet.Object.extend(/** @lends NeatComet.SafeChannelClient.prototype */{
+NeatComet.router.ConnectionClient = NeatComet.Object.extend(/** @lends NeatComet.router.ConnectionClient.prototype */{
 
 	/** @type {NeatComet.api.ICometClient} */
 	comet: null,

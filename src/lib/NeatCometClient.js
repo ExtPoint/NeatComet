@@ -31,8 +31,8 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
     /** @type {Object.<string, NeatComet.router.OpenedProfileClient[]>} */
     _openedProfilesByProfileId: null,
 
-    /** @type {NeatComet.SafeChannelClient} */
-    _channel: null,
+    /** @type {NeatComet.router.ConnectionClient} */
+    _connection: null,
 
     /** @type {number} */
     _lastId: 0,
@@ -44,7 +44,7 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         this._openedProfilesByProfileId = {};
 
         // Setup channel
-        this._channel = new NeatComet.SafeChannelClient({
+        this._connection = new NeatComet.router.ConnectionClient({
             comet: this.comet,
             onConnectionRestore: _.bind(this.refresh, this),
             onInit: _.bind(this._onRefreshResponse, this),
@@ -56,7 +56,7 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
 
         // Call server
         if (this._openedProfileParams.length) {
-            this._channel.sendOpen(this._openedProfileParams);
+            this._connection.sendOpen(this._openedProfileParams);
         }
     },
 
@@ -81,7 +81,7 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
 
         // Connect
         // TODO: optimize
-        if (this._channel && this._channel.isReady) {
+        if (this._connection && this._connection.isReady) {
             this.refresh();
         }
 

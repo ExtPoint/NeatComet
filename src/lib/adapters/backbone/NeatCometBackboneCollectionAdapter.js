@@ -122,4 +122,28 @@
 
     };
 
+    NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter.install = function(config) {
+
+        return function(profileId, bindingId, definition, openedProfile) {
+
+            // Get model class
+            var modelClass = config.getModelClass ?
+                config.getModelClass(profileId, bindingId, definition, openedProfile) :
+                Backbone.Model;
+
+            // Get collection class
+            var collectionClass = config.getCollectionClass ?
+                config.getCollectionClass(profileId, bindingId, definition, openedProfile) :
+                Backbone.Collection;
+
+            // Create
+            return new NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter({
+                collection:
+                    new collectionClass([], {
+                        model: modelClass
+                    })
+            });
+        };
+    };
+
 })();

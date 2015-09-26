@@ -10,76 +10,76 @@
  */
 NeatComet.router.ConnectionClient = NeatComet.Object.extend(/** @lends NeatComet.router.ConnectionClient.prototype */{
 
-	/** @type {NeatComet.api.ICometClient} */
-	comet: null,
+    /** @type {NeatComet.api.ICometClient} */
+    comet: null,
 
-	/** @type {Function} */
-	onConnectionRestore: null,
+    /** @type {Function} */
+    onConnectionRestore: null,
 
-	/** @type {Function} */
-	onInit: null,
+    /** @type {Function} */
+    onInit: null,
 
-	/** @type {Function} */
-	onMessage: null,
+    /** @type {Function} */
+    onMessage: null,
 
-	isReady: false,
+    isReady: false,
 
-	_lastInitId: 0,
-	_waitingFor: 1, // Lock initially. Null = not waiting
-	_messageQueue: [],
+    _lastInitId: 0,
+    _waitingFor: 1, // Lock initially. Null = not waiting
+    _messageQueue: [],
 
-	init: function() {
+    init: function() {
 
-		// Install comet listeners
+        // Install comet listeners
         this.comet.bindEvents({
             onConnectionRestore: _.bind(this._onCometConnectionRestore, this),
             onMessage: _.bind(this._onCometMessage, this)
         });
-	},
+    },
 
-	_onCometConnectionRestore: function() {
+    _onCometConnectionRestore: function() {
 
-		this.isReady = true;
-		this.onConnectionRestore();
-	},
+        this.isReady = true;
+        this.onConnectionRestore();
+    },
 
-	_onCometMessage: function(channel, data) {
+    _onCometMessage: function(channel, data) {
 
-		if (this._waitingFor) {
-			this._messageQueue.push([channel, data]);
-		}
-		else {
-			this.onMessage(channel, data);
-		}
-	},
+        if (this._waitingFor) {
+            this._messageQueue.push([channel, data]);
+        }
+        else {
+            this.onMessage(channel, data);
+        }
+    },
 
     sendOpen: function(params) {
 
-		// Force initialization-time messages to run after initialization
-		var requestId = ++this._lastInitId;
-		this._waitingFor = requestId;
-		this._messageQueue = [];
+        // Force initialization-time messages to run after initialization
+        var requestId = ++this._lastInitId;
+        this._waitingFor = requestId;
+        this._messageQueue = [];
 
-		this.comet.sendOpen(params, _.bind(function(data) {
+        this.comet.sendOpen(params, _.bind(function(data) {
 
-			// Drop the result of a wrong call
-			if (this._waitingFor != requestId) {
-				return;
-			}
+            // Drop the result of a wrong call
+            if (this._waitingFor != requestId) {
+                return;
+            }
 
-			// Stop waiting
-			this._waitingFor = null;
+            // Stop waiting
+            this._waitingFor = null;
 
-			// Effective init
-			this.onInit(data);
+            // Effective init
+            this.onInit(data);
 
-			// Flush pending messages
-			_.each(this._messageQueue, function(message) {
-				this.onMessage.apply(this, message);
-			}, this);
-			this._messageQueue = [];
+            // Flush pending messages
+            _.each(this._messageQueue, function(message) {
+                this.onMessage.apply(this, message);
+            }, this);
+            this._messageQueue = [];
 
-		}, this));
-	}
+        }, this));
+    }
 
 });

@@ -122,21 +122,4 @@
 
     };
 
-    /**
-     * @param {NeatComet.SimpleCollectionMapperClient} collectionMapper
-     * @param {NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter~idMapper|null} idMapper
-     * @returns {Function}
-     */
-    NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter.wrap = function(collectionMapper, idMapper) {
-
-        return function(profileId, bindingId, openedProfileId) {
-
-            return new NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter({
-                collection: collectionMapper.get(profileId, bindingId),
-                idMapper: idMapper
-            });
-        };
-    };
-
-
 })();

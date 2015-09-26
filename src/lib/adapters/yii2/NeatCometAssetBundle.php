@@ -15,7 +15,6 @@ class NeatCometAssetBundle extends AssetBundle {
         'NeatCometClient.js',
         'router/ConnectionClient.js',
         'router/OpenedProfileClient.js',
-        'SimpleCollectionMapperClient.js',
     ];
 
     /**

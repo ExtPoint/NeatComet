@@ -6,4 +6,3 @@ require('./lib/Exception');
 require('./lib/NeatCometClient');
 require('./lib/router/ConnectionClient');
 require('./lib/router/OpenedProfileClient');
-require('./lib/SimpleCollectionMapperClient');

@@ -16,7 +16,7 @@ function initSubject(requestParams, mockProfileBindings) {
     // Mock ConnectionServer
     openedProfile.connection = {
         // Mock NeatCometServer
-        server: {
+        manager: {
             profileBindings: mockProfileBindings,
 
             externalDataLoader: null // Used below

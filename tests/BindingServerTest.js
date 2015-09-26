@@ -17,7 +17,7 @@ function initSubject(definition) {
     };
 
     return new NeatComet.bindings.BindingServer({
-        neatComet: {},
+        manager: {},
         profile: 'theProfile',
         id: 'theBinding',
         definition: definition

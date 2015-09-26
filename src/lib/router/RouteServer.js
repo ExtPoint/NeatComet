@@ -13,7 +13,7 @@ var when = require('when');
 var self = NeatComet.router.RouteServer = NeatComet.Object.extend(/** @lends NeatComet.router.RouteServer.prototype */{
 
     /** @type {NeatComet.NeatCometServer} */
-    server: null,
+    manager: null,
 
     /** @type {Object.<string, NeatComet.router.ConnectionServer>} */
     _connections: null,
@@ -36,8 +36,8 @@ var self = NeatComet.router.RouteServer = NeatComet.Object.extend(/** @lends Nea
             // Init
             var connection = new NeatComet.router.ConnectionServer;
             connection.connectionId = connectionId;
-            connection.comet = this.server.comet;
-            connection.server = this.server;
+            connection.comet = this.manager.comet;
+            connection.manager = this.manager;
             connection.init();
 
             // List

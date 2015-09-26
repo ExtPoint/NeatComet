@@ -17,7 +17,7 @@ function initSubject(mockProfileBindings, externalDataLoader) {
     // Mock ConnectionServer
     openedProfile.connection = {
         // Mock NeatCometServer
-        server: {
+        manager: {
             profileBindings: {
                 theProfile: mockProfileBindings
             }
@@ -28,7 +28,7 @@ function initSubject(mockProfileBindings, externalDataLoader) {
     openedProfile.init();
 
     // Mock data source
-    openedProfile.connection.server.externalDataLoader = externalDataLoader;
+    openedProfile.connection.manager.externalDataLoader = externalDataLoader;
 
 
     // Emulate binding load. UNSAFE
@@ -191,7 +191,7 @@ module.exports = {
         }
 
         function mockDependencies(externalDataLoader, channelPush) {
-            openedProfileServer.connection.server.externalDataLoader = externalDataLoader;
+            openedProfileServer.connection.manager.externalDataLoader = externalDataLoader;
             openedProfileServer.bindings['theDetailBinding'].channel.push = channelPush;
         }
 

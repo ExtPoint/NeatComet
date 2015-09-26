@@ -18,7 +18,7 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
     comet: null,
 
     /** @type {NeatComet.NeatCometServer} */
-    server: null,
+    manager: null,
 
     /** @type {Object.<string, NeatComet.router.OpenedProfileServer>} */
     _openedProfiles: null,
@@ -56,7 +56,7 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
             var profileRequestParams = profileParams[2];
 
             // Get binding
-            var profileBindings = this.server.profileBindings[profileId];
+            var profileBindings = this.manager.profileBindings[profileId];
             if (!profileBindings) {
                 throw new NeatComet.Exception('Wrong profile requested');
             }

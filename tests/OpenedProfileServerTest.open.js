@@ -52,7 +52,7 @@ TestingKit.prototype = {
         // Mock ConnectionServer
         openedProfileServer.connection = {
             // Mock NeatCometServer
-            server: {
+            manager: {
                 profileBindings: {
                     'theProfile': profile
                 },
@@ -65,7 +65,7 @@ TestingKit.prototype = {
         openedProfileServer.init();
 
         // Mock data source
-        openedProfileServer.connection.server.externalDataLoader = this.externalDataLoader;
+        openedProfileServer.connection.manager.externalDataLoader = this.externalDataLoader;
 
         // Don't test updateMasterValues this run. Mock it
         openedProfileServer.updateMasterValues = this.updateMasterValues;

@@ -52,7 +52,7 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     channel: null,
 
     /** @type {NeatComet.NeatCometServer} */
-    neatComet: null,
+    manager: null,
 
     /** @type {Object.<string, NeatComet.bindings.BindingServer[]>} */
     masterKeys: null,

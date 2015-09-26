@@ -42,7 +42,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
     init: function() {
         
-        this.bindings = this.connection.server.profileBindings[this.profile];
+        this.bindings = this.connection.manager.profileBindings[this.profile];
 
         // Init master values
         _.each(this.bindings, function(binding) {
@@ -246,7 +246,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
         // Create data loader
         var dataLoader = new NeatComet.router.DataLoaderServer;
-        dataLoader.neatComet = this.connection.server;
+        dataLoader.manager = this.connection.manager;
         dataLoader.profile = this.profile;
         dataLoader.init();
 

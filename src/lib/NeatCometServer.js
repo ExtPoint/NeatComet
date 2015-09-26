@@ -45,7 +45,7 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
         // May be absent in case of "Business logic source only"
         if (NeatComet.router) {
             this.routeServer = new NeatComet.router.RouteServer();
-            this.routeServer.server = this;
+            this.routeServer.manager = this;
             this.routeServer.init();
             comet.bindServerEvents(this.routeServer);
         }
@@ -70,7 +70,7 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
             _.each(bindingDefinitions, function(definition, id) {
 
                 var binding = new NeatComet.bindings.BindingServer({
-                    neatComet: this,
+                    manager: this,
                     profile: profile,
                     id: id,
                     definition: definition

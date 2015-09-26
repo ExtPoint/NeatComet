@@ -20,6 +20,14 @@ NeatComet.api.ICollectionClient = function() {};
 NeatComet.api.ICollectionClient.prototype = {
 
     /**
+     * Get native collection for OpenedProfileClient.populateNamespace()
+     * @returns {object}
+     */
+    getNative: function() {
+
+    },
+
+    /**
      * Set exact list of records
      * @param {object[]} list
      */

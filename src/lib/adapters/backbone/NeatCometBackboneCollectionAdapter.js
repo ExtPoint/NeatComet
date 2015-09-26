@@ -32,6 +32,10 @@
         /** @type {NeatComet.adapters.backbone.NeatCometBackboneCollectionAdapter~idMapper|null} */
         idMapper: null,
 
+        getNative: function() {
+            return this.collection;
+        },
+
         reset: function(list) {
 
             // Scan list

@@ -70,9 +70,7 @@ var self = NeatComet.configReader.ConfigReader = NeatComet.Object.extend(/** @le
         _.each(this.profiles, function(profileDefinition, profileId) {
             result[profileId] = {};
             _.each(profileDefinition, function(bindingDefinition, bindingId) {
-                if (_.has(bindingDefinition, 'client')) {
-                    result[profileId][bindingId] = bindingDefinition.client;
-                }
+                result[profileId][bindingId] = bindingDefinition.client || null;
             });
         });
 

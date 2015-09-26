@@ -16,8 +16,11 @@ NeatComet.router.OpenedProfileClient = NeatComet.Object.extend(/** @lends NeatCo
     /** @type {String} */
     profileId: null,
 
-    /** @type {NeatComet.NeatCometClient} */
-    manager: null,
+    /** @type {NeatComet.NeatCometClient~createCollection} */
+    createCollection: null,
+
+    /** @type {Object.<string, Object.<string, *>>} */
+    profileDefinition: null,
 
     /** @type {Object.<string, NeatComet.api.ICollectionClient>} */
     collections: null,
@@ -30,17 +33,30 @@ NeatComet.router.OpenedProfileClient = NeatComet.Object.extend(/** @lends NeatCo
 
         // Lazy init
         if (!_.has(this.collections, bindingId)) {
+            
+            if (!_.has(this.profileDefinition, bindingId)) {
+                throw new NeatComet.Exception('Wrong bindingId ' + bindingId);
+            }
 
-            this.collections[bindingId] = this.manager.getCollection(
+            this.collections[bindingId] = this.createCollection(
                 this.profileId,
                 bindingId,
-                this.manager.clientParams && this.manager.clientParams[this.profileId]
-                    && this.manager.clientParams[this.profileId][bindingId] || null,
+                this.profileDefinition[bindingId],
                 this
             );
         }
 
         return this.collections[bindingId];
+    },
+
+    /**
+     * @param {Object} target
+     */
+    populateNamespace: function(target) {
+
+        _.each(this.profileDefinition, function (params, bindingId) {
+            target[bindingId] = this.getCollection(bindingId).getNative();
+        }, this);
     }
 
 });

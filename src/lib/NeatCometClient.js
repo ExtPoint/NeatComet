@@ -1,8 +1,8 @@
 /**
- * @callback NeatComet.NeatCometClient~getCollection
+ * @callback NeatComet.NeatCometClient~createCollection
  * @param {string} profileId
  * @param {string} bindingId
- * @param {*} clientParams
+ * @param {*} profilesDefinition
  * @param {NeatComet.router.OpenedProfileClient} openedProfile
  * @returns {NeatComet.api.ICollectionClient}
  */
@@ -16,11 +16,11 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
     /** @type {NeatComet.api.ICometClient} */
     comet: null,
 
-    /** @type {NeatComet.NeatCometClient~getCollection} */
-    getCollection: null,
+    /** @type {NeatComet.NeatCometClient~createCollection} */
+    createCollection: null,
 
     /** @type {Object.<string, Object.<string, *>>} */
-    clientParams: null,
+    profilesDefinition: null,
 
     /** @type {Object} */
     _openedProfileParams: null,
@@ -70,7 +70,8 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         var openedProfile = new NeatComet.router.OpenedProfileClient();
         openedProfile.id = openedProfileId;
         openedProfile.profileId = profileId;
-        openedProfile.manager = this;
+        openedProfile.createCollection = this.createCollection || /* legacy */ this.getCollection;
+        openedProfile.profileDefinition = this.profilesDefinition[profileId];
         openedProfile.init();
         this._openedProfiles[openedProfileId] = openedProfile;
 

@@ -91,9 +91,7 @@ class ConfigReader extends Object {
 
         foreach ($this->profiles as $profileId => $profileDefinition) {
             foreach ($profileDefinition as $bindingId => $bindingDefinition) {
-                if (array_key_exists('client', $bindingDefinition)) {
-                    $result[$profileId][$bindingId] = $bindingDefinition['client'];
-                }
+                $result[$profileId][$bindingId] = isset($bindingDefinition->client) ? $bindingDefinition->client : null;
             }
         }
 

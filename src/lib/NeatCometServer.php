@@ -99,9 +99,7 @@ class NeatCometServer extends Object {
 
         foreach ((array)$profiles as $profileId) {
             foreach ($this->profileBindings[$profileId] as $bindingId => $binding) {
-                if ($binding->client !== null) {
-                    $result[$profileId][$bindingId] = $binding->client;
-                }
+                $result[$profileId][$bindingId] = $binding->client ?: null;
             }
         }
 

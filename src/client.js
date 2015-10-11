@@ -1,4 +1,4 @@
-window._ = require('./../quick_start/legacy_comet_server/node_modules/lodash');
+window._ = window._ || require('underscore');
 
 require('./lib/clientBaseBrowserify');
 require('./lib/Object');

@@ -1,4 +1,4 @@
-global._ = require('./../quick_start/legacy_comet_server/node_modules/lodash');
+global._ = require('underscore');
 
 require('./lib/serverBase');
 require('./lib/Object');

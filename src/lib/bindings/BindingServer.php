@@ -41,6 +41,9 @@ class BindingServer extends Object {
     /** @var string|null */
     public $routeMode;
 
+    /** @var string[]|null */
+    public $attributes;
+
     /** @var string */
     public $serverModel;
 
@@ -62,11 +65,19 @@ class BindingServer extends Object {
     /** @var boolean[] */
     public $masterKeys = [];
 
+    /** @var array|null */
+    public $attributesFilter = null;
+
 
     /**
      * @throws Exception
      */
     public function init() {
+
+        // Cache helpers
+        if ($this->attributes !== null) {
+            $this->attributesFilter = array_flip($this->attributes);
+        }
 
         // Assign params
         foreach ($this->definition as $key => $value) {
@@ -132,7 +143,8 @@ class BindingServer extends Object {
                 $match,
                 IOrmLoader::WHERE_SQL,
                 $this->whereSql,
-                $request
+                $request,
+                $this
             );
         }
 
@@ -143,7 +155,8 @@ class BindingServer extends Object {
                 $match,
                 IOrmLoader::WHERE_JS,
                 $this->where,
-                $request
+                $request,
+                $this
             );
         }
 
@@ -153,8 +166,16 @@ class BindingServer extends Object {
                 $match,
                 IOrmLoader::WHERE_NONE,
                 null,
-                null
+                null,
+                $this
             );
+        }
+
+        // Filter loaded attributes
+        if ($this->attributesFilter !== null) {
+            foreach ($data as &$item) {
+                $item = array_intersect_key($item, $this->attributesFilter);
+            }
         }
 
         // Pack

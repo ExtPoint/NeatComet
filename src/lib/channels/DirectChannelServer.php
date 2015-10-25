@@ -136,7 +136,15 @@ class DirectChannelServer extends BaseChannelServer {
 
     public function sendAdd($attributeValues) {
 
-        $this->push($this->getChannelByAttributes($attributeValues), ["add", $attributeValues]);
+        $channel = $this->getChannelByAttributes($attributeValues);
+
+        // Filter
+        if ($this->binding->attributesFilter !== null) {
+            $attributeValues = array_intersect_key($attributeValues, $this->binding->attributesFilter);
+        }
+
+        // Send
+        $this->push($channel, ["add", $attributeValues]);
     }
 
     public function sendUpdate($updatedAttributeValues, $oldAttributeValues) {
@@ -144,6 +152,13 @@ class DirectChannelServer extends BaseChannelServer {
         $newChannel = $this->getChannelByAttributes($updatedAttributeValues);
         $oldChannel = $this->getChannelByAttributes($oldAttributeValues);
 
+        // Filter
+        if ($this->binding->attributesFilter !== null) {
+            $updatedAttributeValues = array_intersect_key($updatedAttributeValues, $this->binding->attributesFilter);
+            $oldAttributeValues = array_intersect_key($oldAttributeValues, $this->binding->attributesFilter);
+        }
+
+        // Send
         if ($newChannel !== $oldChannel) {
             $this->push($newChannel, ["add", $updatedAttributeValues]);
             $this->push($oldChannel, ["remove", $oldAttributeValues]);
@@ -155,6 +170,14 @@ class DirectChannelServer extends BaseChannelServer {
 
     public function sendRemove($oldAttributeValues) {
 
-        $this->push($this->getChannelByAttributes($oldAttributeValues), ["remove", $oldAttributeValues]);
+        $channel = $this->getChannelByAttributes($oldAttributeValues);
+
+        // Filter
+        if ($this->binding->attributesFilter !== null) {
+            $oldAttributeValues = array_intersect_key($oldAttributeValues, $this->binding->attributesFilter);
+        }
+
+        // Send
+        $this->push($channel, ["remove", $oldAttributeValues]);
     }
 }

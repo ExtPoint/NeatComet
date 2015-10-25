@@ -1,6 +1,8 @@
 <?php
 namespace NeatComet\api;
 
+use NeatComet\bindings\BindingServer;
+
 interface IOrmLoader {
 
     const TABLE_ALIAS_IN_SQL = 'model';
@@ -15,8 +17,9 @@ interface IOrmLoader {
      * @param string $whereType
      * @param string|null $where
      * @param array $attributes
+     * @param BindingServer $binding
      * @returns array Array of records data
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes);
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding);
 
 }

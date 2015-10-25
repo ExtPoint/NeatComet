@@ -39,6 +39,9 @@
                 "channelTemplate": "ccc={category}",
 
 
+                // Attributes subset, optional
+                "attributes": ["id", "category"],
+
                 // Server model id
                 "serverModel": "app\\modules\\cometSample\\models\\DemoRow",
 

@@ -17,6 +17,9 @@ class NeatCometComponent extends Object implements IOrmLoader {
     /** @var NeatCometServer */
     public $server;
 
+    /** @var bool|bool[] */
+    public $hasDynamicAttributes = false;
+
     public function __construct(array $config = []) {
 
         // Create aggregate
@@ -55,15 +58,16 @@ class NeatCometComponent extends Object implements IOrmLoader {
     }
 
     /**
-     * @param ActiveRecord $modelClass
+     * @param string|ActiveRecord $modelClass
      * @param \StdClass|null $match
      * @param string $whereType
      * @param string|null $where
      * @param string[] $attributes
+     * @param BindingServer $binding
      * @returns array Array of records data
      * @throws Exception
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes) {
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding) {
 
         /** @var ActiveQuery $query */
         $query = $modelClass::find();
@@ -94,8 +98,24 @@ class NeatCometComponent extends Object implements IOrmLoader {
                 throw new Exception('Where type "' . $whereType . '" is not implemented');
         }
 
-        // Query
-        return $query->asArray()->all();
+        // Query via model implementation
+        if (
+            $this->hasDynamicAttributes === true
+            || is_array($this->hasDynamicAttributes) && !empty($this->hasDynamicAttributes[$modelClass])
+        ) {
+            $result = [];
+            foreach ($query->all() as $model) {
+                $result[] = $model->attributes; // Filter is outside loadRecords()
+            }
+            return $result;
+        }
+        // Direct db query
+        else {
+            if ($binding->attributes !== null) {
+                $query->select($binding->attributes);
+            }
+            return $query->asArray()->all();
+        }
     }
 
     /**

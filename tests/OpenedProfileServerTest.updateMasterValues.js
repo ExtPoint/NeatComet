@@ -1,95 +1,122 @@
 require('./bootstrap');
 var when = require('when');
+require('../src/lib/NeatCometServer'); // For intersectKeys, TODO: extract utils
 require('../src/lib/router/OpenedProfileServer');
 require('../src/lib/router/DataLoaderServer');
 
-/**
- * @param {Object} mockProfileBindings
- * @param {Function} externalDataLoader
- * @returns {NeatComet.router.OpenedProfileServer}
- */
-function initSubject(mockProfileBindings, externalDataLoader) {
+var TestingKit = function(test) {
+    this.test = test;
+    this.init();
+};
 
-    var openedProfile = new NeatComet.router.OpenedProfileServer();
-    openedProfile.id = 123;
-    openedProfile.profileId = 'theProfile';
+TestingKit.prototype = {
 
-    // Mock ConnectionServer
-    openedProfile.connection = {
-        // Mock NeatCometServer
-        manager: {
-            profileBindings: {
-                theProfile: mockProfileBindings
+    /** @type {NodeUnit} */
+    test: null,
+
+    /** @type {NeatComet.router.OpenedProfileServer} */
+    openedProfile: null,
+
+    /** @type {Function} */
+    externalDataLoader: null,
+
+    /** @type {Function} */
+    detailChannelPush: null,
+
+    /** @type {Function} */
+    detailChannelUpdateChannels: null,
+
+    /** @type {Object.<string, NeatComet.bindings.BindingServer>} */
+    profileBindings: null,
+
+    init: function() {
+
+        this.externalDataLoader = this.test.mockFunction('externalDataLoader');
+        this.detailChannelPush = this.test.mockFunction('detailChannelPush');
+        this.detailChannelUpdateChannels = this.test.mockFunction('detailChannelUpdateChannels');
+    },
+
+    initOpenedProfile: function() {
+
+        var openedProfile = this.openedProfile = new NeatComet.router.OpenedProfileServer();
+        openedProfile.id = 123;
+        openedProfile.profileId = 'theProfile';
+
+        // Mock ConnectionServer
+        openedProfile.connection = {
+            // Mock NeatCometServer
+            manager: {
+                profileBindings: {
+                    theProfile: this.profileBindings
+                }
             }
-        }
-    };
+        };
 
-    openedProfile.requestParams = {};
-    openedProfile.init();
+        openedProfile.requestParams = {};
+        openedProfile.init();
 
-    // Mock data source
-    openedProfile.connection.manager.externalDataLoader = externalDataLoader;
-
-
-    // Emulate binding load. UNSAFE
-    openedProfile._initMasterKeysForLoad();
-    _.each(openedProfile.bindings, function(binding, bindingId) {
-        openedProfile._markBindingLoaded(openedProfile.bindings[bindingId]);
-    });
+        // Mock data source
+        openedProfile.connection.manager.externalDataLoader = this.externalDataLoader;
 
 
-    return openedProfile;
-}
+        // Emulate binding load. UNSAFE
+        openedProfile._initMasterKeysForLoad();
+        _.each(openedProfile.bindings, function(binding, bindingId) {
+            openedProfile._markBindingLoaded(openedProfile.bindings[bindingId]);
+        });
+    },
 
-function initMasterDetailBindings(channelPush) {
+    useMasterDetailBindings: function() {
 
-    var detailBinding = {
-        id: 'theDetailBinding',
-        match: {
-            'theDetailAttribute': 'theMasterBinding.theMasterAttribute'
-        },
-        channel: {
-            push: channelPush
-        }
-    };
+        var detailBinding = {
+            id: 'theDetailBinding',
+            match: {
+                'theDetailAttribute': 'theMasterBinding.theMasterAttribute'
+            },
+            channel: {
+                push: this.detailChannelPush,
+                updateChannels: this.detailChannelUpdateChannels
+            }
+        };
 
-    var masterBinding = {
-        id: 'theMasterBinding',
-        masterKeys: {'theMasterAttribute': [detailBinding]}
-    };
+        var masterBinding = {
+            id: 'theMasterBinding',
+            masterKeys: {'theMasterAttribute': [detailBinding]}
+        };
 
-    return {
-        'theMasterBinding': masterBinding,
-        'theDetailBinding': detailBinding
-    };
-}
+        this.profileBindings = {
+            'theMasterBinding': masterBinding,
+            'theDetailBinding': detailBinding
+        };
+    },
+
+    runSimpleCascade: function(noCascade) {
+
+        var expectedParamsAfterUpdate = {
+            'theMasterBinding.theMasterAttribute': ['theMatchingValue']
+        };
+
+        // Init
+        this.useMasterDetailBindings();
+        this.initOpenedProfile();
 
 
-function simpleCascade(test, noCascade, externalDataLoader, channelPush) {
+        // Test
+        this.openedProfile.updateMasterValues(
+            // Call for bindingId
+            'theMasterBinding',
+            // Add
+            'theId', { theMasterAttribute: 'theMatchingValue' },
+            // Remove
+            null, null,
+            // No cascade
+            noCascade
+        );
+        this.test.deepEqual(this.openedProfile.requestParams, expectedParamsAfterUpdate);
 
-    // Init
-    var openedProfileServer = initSubject(
-        initMasterDetailBindings(channelPush),
-        externalDataLoader
-    );
+    }
 
-
-    // Test
-    openedProfileServer.updateMasterValues(
-        // Call for bindingId
-        'theMasterBinding',
-        // Add
-        'theId', { theMasterAttribute: 'theMatchingValue' },
-        // Remove
-        null, null,
-        // No cascade
-        noCascade
-    );
-    test.deepEqual(openedProfileServer.requestParams, {
-        'theMasterBinding.theMasterAttribute': ['theMatchingValue']
-    });
-
-}
+};
 
 
 module.exports = {
@@ -99,20 +126,21 @@ module.exports = {
      */
     "test single binding": function(test) {
 
+        var attempt = new TestingKit(test);
+
+
         // Init
-        var openedProfileServer = initSubject(
-            {
-                'theBinding': {
-                    id: 'theBinding'
-                    // No channel.push side effect
-                }
-            },
-            test.mockFunction('externalDataLoader')
-        );
+        attempt.profileBindings = {
+            'theBinding': {
+                id: 'theBinding'
+                // No channel.push side effect
+            }
+        };
+        attempt.initOpenedProfile();
 
 
         // Test
-        openedProfileServer.updateMasterValues(
+        attempt.openedProfile.updateMasterValues(
             // Call for bindingId
             'theBinding',
             // Add
@@ -121,7 +149,7 @@ module.exports = {
             null, null
             // No cascade = default false
         );
-        test.deepEqual(openedProfileServer.requestParams, {});
+        test.deepEqual(attempt.openedProfile.requestParams, {});
 
 
         test.done();
@@ -132,35 +160,40 @@ module.exports = {
      */
     "test simple cascade": function(test) {
 
+        var attempt = new TestingKit(test);
+
+
+        // Init
         var detailRecord = { id: 'theDetailMatchingId', 'theDetailAttribute': 'theMatchingValue' };
 
-        simpleCascade(test,
-            false,
-            test.mockFunction('externalDataLoader',
-                {
-                    arguments: [
-                        // batchParams
-                        [
-                            ['theProfile', 'theDetailBinding', {
-                                'theMasterBinding.theMasterAttribute': 'theMatchingValue'
-                            }]
-                        ]
-                    ],
-                    return: when.resolve([
-                        [detailRecord]
-                    ])
-                }
-            ),
-            test.mockFunction('channel.push',
-                function(openedProfile, message) {
-                    test.equal(arguments.length, 2);
-                    //test.equal(openedProfile, openedProfileServer);
-                    test.deepEqual(message, ['add', detailRecord]);
+        // Mock expected calls
+        attempt.externalDataLoader.mockStep({
+            arguments: [
+                // batchParams
+                [
+                    ['theProfile', 'theDetailBinding', {
+                        'theMasterBinding.theMasterAttribute': 'theMatchingValue'
+                    }]
+                ]
+            ],
+            return: when.resolve([
+                [detailRecord]
+            ])
+        });
 
-                    test.done();
-                }
-            )
+        attempt.detailChannelPush.mockStep(
+            function(openedProfile, message) {
+                test.equal(arguments.length, 2);
+                //test.equal(openedProfile, attempt.openedProfile);
+                test.deepEqual(message, ['add', detailRecord]);
+
+                test.done();
+            }.bind(this)
         );
+
+
+        // Test
+        attempt.runSimpleCascade(false);
     },
 
     /**
@@ -168,11 +201,10 @@ module.exports = {
      */
     "test simple no cascade": function(test) {
 
-        simpleCascade(test,
-            true,
-            test.mockFunction('externalDataLoader'),
-            test.mockFunction('channel.push')
-        );
+        var attempt = new TestingKit(test);
+
+        // Test
+        attempt.runSimpleCascade(true);
 
         test.done();
     },
@@ -182,17 +214,15 @@ module.exports = {
      */
     "test add-update-delete": function(test) {
 
+        var attempt = new TestingKit(test);
+
+
         // Macros
         var detailRecordNumber = 1;
         function newDetailRecord() {
             return {
                 'theAttribute': detailRecordNumber++
             }
-        }
-
-        function mockDependencies(externalDataLoader, channelPush) {
-            openedProfileServer.connection.manager.externalDataLoader = externalDataLoader;
-            openedProfileServer.bindings['theDetailBinding'].channel.push = channelPush;
         }
 
         var donePromise = when.resolve();
@@ -202,6 +232,7 @@ module.exports = {
             });
         }
 
+
         // Step scenarios
         function normalAdd(matchingValue, expectedResult) {
 
@@ -210,34 +241,33 @@ module.exports = {
                 var addDetailRecord1 = newDetailRecord();
                 var addDetailRecord2 = newDetailRecord();
 
-                mockDependencies(
-                    test.mockFunction('externalDataLoader',
-                        {
-                            arguments: [
-                                // batchParams
-                                [
-                                    ['theProfile', 'theDetailBinding', {
-                                        'theMasterBinding.theMasterAttribute': matchingValue
-                                    }]
-                                ]
-                            ],
-                            return: when.resolve([
-                                [addDetailRecord1, addDetailRecord2]
-                            ])
-                        }
-                    ),
-                    test.mockFunction('channel.push',
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord1]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord2]],
-                            sideEffect: resolveStepDone
-                        }
-                    )
+                attempt.externalDataLoader.mockStep(
+                    {
+                        arguments: [
+                            // batchParams
+                            [
+                                ['theProfile', 'theDetailBinding', {
+                                    'theMasterBinding.theMasterAttribute': matchingValue
+                                }]
+                            ]
+                        ],
+                        return: when.resolve([
+                            [addDetailRecord1, addDetailRecord2]
+                        ])
+                    }
                 );
 
-                openedProfileServer.updateMasterValues(
+                attempt.detailChannelPush.mockStep(
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord1]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord2]],
+                        sideEffect: resolveStepDone
+                    }
+                );
+
+                attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
                     // Add
@@ -246,7 +276,7 @@ module.exports = {
                     null, null
                 );
 
-                test.deepEqual(openedProfileServer.requestParams, {
+                test.deepEqual(attempt.openedProfile.requestParams, {
                     'theMasterBinding.theMasterAttribute': expectedResult
                 });
             });
@@ -261,44 +291,43 @@ module.exports = {
                 var removeDetailRecord1 = newDetailRecord();
                 var removeDetailRecord2 = newDetailRecord();
 
-                mockDependencies(
-                    test.mockFunction('externalDataLoader',
-                        {
-                            arguments: [
-                                // batchParams
-                                [
-                                    ['theProfile', 'theDetailBinding', {
-                                        'theMasterBinding.theMasterAttribute': matchingAddValue
-                                    }],
-                                    ['theProfile', 'theDetailBinding', {
-                                        'theMasterBinding.theMasterAttribute': matchingRemoveValue
-                                    }]
-                                ]
-                            ],
-                            return: when.resolve([
-                                [addDetailRecord1, addDetailRecord2],
-                                [removeDetailRecord1, removeDetailRecord2]
-                            ])
-                        }
-                    ),
-                    test.mockFunction('channel.push',
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord1]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord2]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['remove', removeDetailRecord1]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['remove', removeDetailRecord2]],
-                            sideEffect: resolveStepDone
-                        }
-                    )
+                attempt.externalDataLoader.mockStep(
+                    {
+                        arguments: [
+                            // batchParams
+                            [
+                                ['theProfile', 'theDetailBinding', {
+                                    'theMasterBinding.theMasterAttribute': matchingAddValue
+                                }],
+                                ['theProfile', 'theDetailBinding', {
+                                    'theMasterBinding.theMasterAttribute': matchingRemoveValue
+                                }]
+                            ]
+                        ],
+                        return: when.resolve([
+                            [addDetailRecord1, addDetailRecord2],
+                            [removeDetailRecord1, removeDetailRecord2]
+                        ])
+                    }
                 );
 
-                openedProfileServer.updateMasterValues(
+                attempt.detailChannelPush.mockStep(
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord1]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord2]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['remove', removeDetailRecord1]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['remove', removeDetailRecord2]],
+                        sideEffect: resolveStepDone
+                    }
+                );
+
+                attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
                     // Add
@@ -307,7 +336,7 @@ module.exports = {
                     'theId', { theMasterAttribute: matchingRemoveValue }
                 );
 
-                test.deepEqual(openedProfileServer.requestParams, {
+                test.deepEqual(attempt.openedProfile.requestParams, {
                     'theMasterBinding.theMasterAttribute': expectedResult
                 });
             });
@@ -320,34 +349,33 @@ module.exports = {
                 var addDetailRecord1 = newDetailRecord();
                 var addDetailRecord2 = newDetailRecord();
 
-                mockDependencies(
-                    test.mockFunction('externalDataLoader',
-                        {
-                            arguments: [
-                                // batchParams
-                                [
-                                    ['theProfile', 'theDetailBinding', {
-                                        'theMasterBinding.theMasterAttribute': matchingAddValue
-                                    }]
-                                ]
-                            ],
-                            return: when.resolve([
-                                [addDetailRecord1, addDetailRecord2]
-                            ])
-                        }
-                    ),
-                    test.mockFunction('channel.push',
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord1]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['add', addDetailRecord2]],
-                            sideEffect: resolveStepDone
-                        }
-                    )
+                attempt.externalDataLoader.mockStep(
+                    {
+                        arguments: [
+                            // batchParams
+                            [
+                                ['theProfile', 'theDetailBinding', {
+                                    'theMasterBinding.theMasterAttribute': matchingAddValue
+                                }]
+                            ]
+                        ],
+                        return: when.resolve([
+                            [addDetailRecord1, addDetailRecord2]
+                        ])
+                    }
                 );
 
-                openedProfileServer.updateMasterValues(
+                attempt.detailChannelPush.mockStep(
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord1]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['add', addDetailRecord2]],
+                        sideEffect: resolveStepDone
+                    }
+                );
+
+                attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
                     // Add
@@ -356,7 +384,7 @@ module.exports = {
                     'theId', { theMasterAttribute: 'theProblemValue' } // This value is prohibited now. Do not fail though.
                 );
 
-                test.deepEqual(openedProfileServer.requestParams, {
+                test.deepEqual(attempt.openedProfile.requestParams, {
                     'theMasterBinding.theMasterAttribute': expectedResult
                 });
             });
@@ -369,34 +397,33 @@ module.exports = {
                 var removeDetailRecord1 = newDetailRecord();
                 var removeDetailRecord2 = newDetailRecord();
 
-                mockDependencies(
-                    test.mockFunction('externalDataLoader',
-                        {
-                            arguments: [
-                                // batchParams
-                                [
-                                    ['theProfile', 'theDetailBinding', {
-                                        'theMasterBinding.theMasterAttribute': matchingRemoveValue
-                                    }]
-                                ]
-                            ],
-                            return: when.resolve([
-                                [removeDetailRecord1, removeDetailRecord2]
-                            ])
-                        }
-                    ),
-                    test.mockFunction('channel.push',
-                        {
-                            arguments: [openedProfileServer, ['remove', removeDetailRecord1]]
-                        },
-                        {
-                            arguments: [openedProfileServer, ['remove', removeDetailRecord2]],
-                            sideEffect: resolveStepDone
-                        }
-                    )
+                attempt.externalDataLoader.mockStep(
+                    {
+                        arguments: [
+                            // batchParams
+                            [
+                                ['theProfile', 'theDetailBinding', {
+                                    'theMasterBinding.theMasterAttribute': matchingRemoveValue
+                                }]
+                            ]
+                        ],
+                        return: when.resolve([
+                            [removeDetailRecord1, removeDetailRecord2]
+                        ])
+                    }
                 );
 
-                openedProfileServer.updateMasterValues(
+                attempt.detailChannelPush.mockStep(
+                    {
+                        arguments: [attempt.openedProfile, ['remove', removeDetailRecord1]]
+                    },
+                    {
+                        arguments: [attempt.openedProfile, ['remove', removeDetailRecord2]],
+                        sideEffect: resolveStepDone
+                    }
+                );
+
+                attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
                     // Add
@@ -405,7 +432,7 @@ module.exports = {
                     'theId', { theMasterAttribute: matchingRemoveValue }
                 );
 
-                test.deepEqual(openedProfileServer.requestParams, {
+                test.deepEqual(attempt.openedProfile.requestParams, {
                     'theMasterBinding.theMasterAttribute': expectedResult
                 });
             });
@@ -415,12 +442,10 @@ module.exports = {
 
             step(function(resolveStepDone) {
 
-                mockDependencies(
-                    test.mockFunction('externalDataLoader'),
-                    test.mockFunction('channel.push')
-                );
+                attempt.externalDataLoader.mockStep();
+                attempt.detailChannelPush.mockStep();
 
-                openedProfileServer.updateMasterValues(
+                attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
                     // Add
@@ -429,7 +454,7 @@ module.exports = {
                     'theId', { theMasterAttribute: 'theProblemValue' } // This value is prohibited now. Do not fail though.
                 );
 
-                test.deepEqual(openedProfileServer.requestParams, {
+                test.deepEqual(attempt.openedProfile.requestParams, {
                     'theMasterBinding.theMasterAttribute': expectedResult
                 });
 
@@ -439,10 +464,8 @@ module.exports = {
 
 
         // Init
-        var openedProfileServer = initSubject(
-            initMasterDetailBindings(test.mockFunction('channel.push')),
-            test.mockFunction('externalDataLoader')
-        );
+        attempt.useMasterDetailBindings();
+        attempt.initOpenedProfile();
 
 
         // Test
@@ -485,5 +508,4 @@ module.exports = {
             test.done();
         });
     }
-
 };

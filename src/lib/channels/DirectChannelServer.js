@@ -175,8 +175,8 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         /** @type {NeatComet.channels.FiltersList} */
         var filters;
 
-        // Create client pusher
-        var pusher = this._createPusher(openedProfile.connection, '!' + openedProfile.id + ':' + this.binding.id);
+        // Get client pusher
+        var pusher = this._requirePusher(openedProfile);
 
         // Check if enabled for the current set of parameters
         filters = this._getFilters(this.binding.applyRequestToMatchObject(openedProfile.requestParams), pusher, openedProfile);
@@ -189,7 +189,41 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
     },
 
     /**
-     *
+     * Do not port this in other languages
+     * @param {NeatComet.router.OpenedProfileServer} openedProfile
+     */
+    updateChannels: function(openedProfile) {
+
+        /** @type {NeatComet.channels.FiltersList} */
+        var filters;
+
+        // Get client pusher
+        var pusher = this._requirePusher(openedProfile);
+
+        // Check if enabled for the current set of parameters
+        filters = this._getFilters(this.binding.applyRequestToMatchObject(openedProfile.requestParams), pusher, openedProfile);
+
+        // Update subscriptions
+        openedProfile.updateChannels(filters.channels, pusher);
+    },
+
+    /**
+     * @param {NeatComet.router.OpenedProfileServer} openedProfile
+     * @returns {Function}
+     * @private
+     */
+    _requirePusher: function(openedProfile) {
+
+        var pusher = openedProfile.pushers[this.binding.id];
+        if (!pusher) {
+            pusher = this._createPusher(openedProfile.connection, '!' + openedProfile.id + ':' + this.binding.id);
+            openedProfile.pushers[this.binding.id] = pusher;
+        }
+
+        return pusher;
+    },
+
+    /**
      * @param {NeatComet.router.ConnectionServer} connection
      * @param {string} clientChannel
      * @returns {Function}

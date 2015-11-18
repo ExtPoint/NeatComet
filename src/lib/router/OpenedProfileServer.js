@@ -34,10 +34,14 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     /** @type {Object.<string, Object.<string, Object.<string, boolean>>>} */
     _knownModels: null,
 
+    /** @type {Object.<string, *>} Just a cache for XxxChannelServer */
+    pushers: null,
+
 
     constructor: function() {
         this._channelFilters = {};
         this._knownModels = {};
+        this.pushers = {};
     },
 
     init: function() {
@@ -323,8 +327,9 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
     /**
      * @param {NeatComet.channels.ChannelsMap} channelsMap
+     * @param {Function} [directSender]
      */
-    updateChannels: function(channelsMap) {
+    updateChannels: function(channelsMap, directSender) {
 
         // Classify
         var add = {};
@@ -340,7 +345,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         });
 
         // Apply
-        this.addChannels(add);
+        this.addChannels(add, directSender);
         this.removeChannels(remove);
     },
 
@@ -358,10 +363,10 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         var binding = this.bindings[bindingId];
 
         // Detect related, reload them
-        var added;
+        var added = {};
         var paramsBeforeOperation;
         var minimalParams;
-        var removed;
+        var removed = {};
 
         // Allow calls on empty master keys
         if (_.isEmpty(addValues) && _.isEmpty(removeValues)) {
@@ -371,8 +376,6 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         if (!noCascade) {
             paramsBeforeOperation = NeatComet.NeatCometServer.cloneRecursive(this.requestParams);
             minimalParams = NeatComet.NeatCometServer.cloneRecursive(this.requestParams);
-            added = {};
-            removed = {};
         }
 
         _.each(addValues, function(value, name) {
@@ -394,9 +397,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                 attributeHash[value] = valueHash = {};
 
                 // Prepare data load
-                if (added) {
-                    added[name] = value;
-                }
+                added[name] = value;
             }
 
             valueHash[addOfModelId] = true;
@@ -423,8 +424,8 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                     var values = this.requestParams[paramName];
                     values.splice(values.indexOf(value), 1);
 
-                    if (removed) {
-                        removed[name] = value;
+                    removed[name] = value;
+                    if (minimalParams) {
                         minimalParams[paramName].splice(minimalParams[paramName].indexOf(value), 1);
                     }
 
@@ -433,12 +434,38 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
             }
         }, this);
 
-        // Stop here, if no cascade
-        if (noCascade || (_.isEmpty(added) && _.isEmpty(removed))) {
+        // Stop here, if no work
+        if (_.isEmpty(added) && _.isEmpty(removed)) {
+            return;
+        }
+
+        var channelsToUpdate = {};
+
+        // Simplified channels update, if no cascade
+        if (noCascade) {
+
+            // Collect related binding channel processors
+            _.each(added, function(value, name) {
+                _.each(binding.masterKeys[name], function (detailBinding) {
+                    channelsToUpdate[detailBinding.id] = detailBinding.channel;
+                }, this);
+            });
+            _.each(removed, function(value, name) {
+                _.each(binding.masterKeys[name], function (detailBinding) {
+                    channelsToUpdate[detailBinding.id] = detailBinding.channel;
+                }, this);
+            });
+
+            // Update
+            _.each(channelsToUpdate, function(channel) {
+                channel.updateChannels(this);
+            }, this);
+
             return;
         }
 
 
+        // Full cascade update
         var dataLoader = this._createDataLoader();
         var reducedParams;
 
@@ -452,9 +479,10 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                 var paramName = bindingId + '.' + name;
                 reducedParams[paramName] = value;
 
-                _.each(binding.masterKeys[name], function(binding) {
+                _.each(binding.masterKeys[name], function(detailBinding) {
 
-                    dataLoader.addParams(binding.id, _.clone(reducedParams), ['add', binding]);
+                    dataLoader.addParams(detailBinding.id, _.clone(reducedParams), ['add', detailBinding]);
+                    channelsToUpdate[detailBinding.id] = detailBinding.channel;
                 }, this);
 
                 reducedParams[paramName] = this.requestParams[paramName];
@@ -469,14 +497,21 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
             var paramName = bindingId + '.' + name;
             reducedParams[paramName] = value;
 
-            _.each(binding.masterKeys[name], function(binding) {
+            _.each(binding.masterKeys[name], function(detailBinding) {
 
-                dataLoader.addParams(binding.id, _.clone(reducedParams), ['remove', binding]);
+                dataLoader.addParams(detailBinding.id, _.clone(reducedParams), ['remove', detailBinding]);
+                channelsToUpdate[detailBinding.id] = detailBinding.channel;
             }, this);
 
             reducedParams[paramName] = minimalParams[paramName];
 
         }, this);
+
+        // Update channel subscriptions
+        _.each(channelsToUpdate, function(channel) {
+            channel.updateChannels(this);
+        }, this);
+
 
         // Load
         dataLoader.load()

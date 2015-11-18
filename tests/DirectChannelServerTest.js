@@ -84,7 +84,9 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
                     test.deepEqual(data, ["add", { 'y': 1 }]);
                 }
             }
-        }
+        },
+
+        pushers: {}
     };
 
     // Test
@@ -121,7 +123,8 @@ module.exports = {
                             test.deepEqual(data, ["add", { 'x': 1 }]);
                         }
                     }
-                }
+                },
+                pushers: {}
             },
 
             // message

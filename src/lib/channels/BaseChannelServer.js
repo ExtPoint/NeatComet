@@ -36,6 +36,14 @@ var self = NeatComet.channels.BaseChannelServer = NeatComet.Object.extend(/** @l
     },
 
     /**
+     * Do not port this in other languages
+     * @param {NeatComet.router.OpenedProfileServer} openedProfile
+     */
+    updateChannels: function(openedProfile) {
+        throw new NeatComet.Exception('Abstract method call');
+    },
+
+    /**
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @param {Array} message
      */

@@ -101,6 +101,15 @@ TestingKit.prototype = {
         this.initOpenedProfile();
 
 
+        // Mock
+        this.detailChannelUpdateChannels.mockStep(
+            function(openedProfile) {
+                this.test.equal(arguments.length, 1);
+                this.test.deepEqual(openedProfile.requestParams, expectedParamsAfterUpdate);
+            }.bind(this)
+        );
+
+
         // Test
         this.openedProfile.updateMasterValues(
             // Call for bindingId
@@ -267,6 +276,13 @@ module.exports = {
                     }
                 );
 
+                attempt.detailChannelUpdateChannels.mockStep(
+                    function(openedProfile) {
+                        test.equal(openedProfile, attempt.openedProfile);
+                        test.deepEqual(openedProfile.requestParams, expectedResult);
+                    }
+                );
+
                 attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
@@ -276,9 +292,7 @@ module.exports = {
                     null, null
                 );
 
-                test.deepEqual(attempt.openedProfile.requestParams, {
-                    'theMasterBinding.theMasterAttribute': expectedResult
-                });
+                test.deepEqual(attempt.openedProfile.requestParams, expectedResult);
             });
         }
 
@@ -327,6 +341,13 @@ module.exports = {
                     }
                 );
 
+                attempt.detailChannelUpdateChannels.mockStep(
+                    function(openedProfile) {
+                        test.equal(openedProfile, attempt.openedProfile);
+                        test.deepEqual(openedProfile.requestParams, expectedResult);
+                    }
+                );
+
                 attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
@@ -336,9 +357,7 @@ module.exports = {
                     'theId', { theMasterAttribute: matchingRemoveValue }
                 );
 
-                test.deepEqual(attempt.openedProfile.requestParams, {
-                    'theMasterBinding.theMasterAttribute': expectedResult
-                });
+                test.deepEqual(attempt.openedProfile.requestParams, expectedResult);
             });
         }
 
@@ -375,6 +394,13 @@ module.exports = {
                     }
                 );
 
+                attempt.detailChannelUpdateChannels.mockStep(
+                    function(openedProfile) {
+                        test.equal(openedProfile, attempt.openedProfile);
+                        test.deepEqual(openedProfile.requestParams, expectedResult);
+                    }
+                );
+
                 attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
@@ -384,9 +410,7 @@ module.exports = {
                     'theId', { theMasterAttribute: 'theProblemValue' } // This value is prohibited now. Do not fail though.
                 );
 
-                test.deepEqual(attempt.openedProfile.requestParams, {
-                    'theMasterBinding.theMasterAttribute': expectedResult
-                });
+                test.deepEqual(attempt.openedProfile.requestParams, expectedResult);
             });
         }
 
@@ -423,6 +447,13 @@ module.exports = {
                     }
                 );
 
+                attempt.detailChannelUpdateChannels.mockStep(
+                    function(openedProfile) {
+                        test.equal(openedProfile, attempt.openedProfile);
+                        test.deepEqual(openedProfile.requestParams, expectedResult);
+                    }
+                );
+
                 attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
                     'theMasterBinding',
@@ -432,9 +463,7 @@ module.exports = {
                     'theId', { theMasterAttribute: matchingRemoveValue }
                 );
 
-                test.deepEqual(attempt.openedProfile.requestParams, {
-                    'theMasterBinding.theMasterAttribute': expectedResult
-                });
+                test.deepEqual(attempt.openedProfile.requestParams, expectedResult);
             });
         }
 
@@ -444,6 +473,7 @@ module.exports = {
 
                 attempt.externalDataLoader.mockStep();
                 attempt.detailChannelPush.mockStep();
+                attempt.detailChannelUpdateChannels.mockStep();
 
                 attempt.openedProfile.updateMasterValues(
                     // Call for bindingId
@@ -454,9 +484,7 @@ module.exports = {
                     'theId', { theMasterAttribute: 'theProblemValue' } // This value is prohibited now. Do not fail though.
                 );
 
-                test.deepEqual(attempt.openedProfile.requestParams, {
-                    'theMasterBinding.theMasterAttribute': expectedResult
-                });
+                test.deepEqual(attempt.openedProfile.requestParams, expectedResult);
 
                 resolveStepDone();
             });
@@ -471,36 +499,52 @@ module.exports = {
         // Test
         normalAdd(
             'theMatchingValue',
-            ['theMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theMatchingValue']
+            }
         );
         normalAdd(
             'theSecondMatchingValue',
-            ['theMatchingValue', 'theSecondMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theMatchingValue', 'theSecondMatchingValue']
+            }
         );
         normalUpdate(
             'theThirdMatchingValue', // Add
             'theMatchingValue', // Remove
-            ['theSecondMatchingValue', 'theThirdMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theSecondMatchingValue', 'theThirdMatchingValue']
+            }
         );
         problemUpdate(
             'theForthMatchingValue', // Add this and ask to remove the irrelevant value.
-            ['theSecondMatchingValue', 'theThirdMatchingValue', 'theForthMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theSecondMatchingValue', 'theThirdMatchingValue', 'theForthMatchingValue']
+            }
         );
         normalRemove(
             'theThirdMatchingValue',
-            ['theSecondMatchingValue', 'theForthMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theSecondMatchingValue', 'theForthMatchingValue']
+            }
         );
         problemRemove(
             // Asking to remove the irrelevant value. Don't crash
-            ['theSecondMatchingValue', 'theForthMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theSecondMatchingValue', 'theForthMatchingValue']
+            }
         );
         normalRemove(
             'theForthMatchingValue',
-            ['theSecondMatchingValue']
+            {
+                'theMasterBinding.theMasterAttribute': ['theSecondMatchingValue']
+            }
         );
         normalRemove(
             'theSecondMatchingValue',
-            []
+            {
+                'theMasterBinding.theMasterAttribute': []
+            }
         );
 
 

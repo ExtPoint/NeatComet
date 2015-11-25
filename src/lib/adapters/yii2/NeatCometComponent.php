@@ -17,6 +17,9 @@ class NeatCometComponent extends Object implements IOrmLoader {
     /** @var NeatCometServer */
     public $server;
 
+    /** @var boolean */
+    public $enable = true;
+
     /** @var bool|bool[] */
     public $hasDynamicAttributes = false;
 
@@ -124,6 +127,9 @@ class NeatCometComponent extends Object implements IOrmLoader {
      * @param array $changedAttributes
      */
     public function afterSave($model, $insert, $changedAttributes) {
+        if (!$this->enable) {
+            return;
+        }
 
         if ($insert) {
 
@@ -150,6 +156,9 @@ class NeatCometComponent extends Object implements IOrmLoader {
      * @param ActiveRecord $model
      */
     public function afterDelete($model) {
+        if (!$this->enable) {
+            return;
+        }
 
         $this->server->broadcastEvent(
             // Route

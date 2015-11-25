@@ -204,7 +204,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         filters = this._getFilters(this.binding.applyRequestToMatchObject(openedProfile.requestParams), pusher, openedProfile);
 
         // Update subscriptions
-        openedProfile.updateChannels(filters.channels, pusher);
+        openedProfile.updateChannels(this.binding.id, filters.channels, pusher);
     },
 
     /**

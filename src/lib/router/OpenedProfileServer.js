@@ -28,7 +28,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     /** @type {Object.<string, *>} */
     requestParams: null,
 
-    /** @type {(NeatComet.channels.FiltersList|Object.<string, Function>)} */
+    /** @type {Object.<string, (Function|boolean)>} */
     _channelFilters: null,
 
     /** @type {Object.<string, Object.<string, Object.<string, boolean>>>} */
@@ -260,7 +260,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     destroy: function() {
 
         // Unsubscribe
-        this.removeChannels(this._channelFilters);
+        this.removeChannels('TODO', this._channelFilters);
 
         // Mark ready to remove
         this.profileId = null;
@@ -273,10 +273,11 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     },
 
     /**
+     * @param {string} bindingId
      * @param {NeatComet.channels.ChannelsMap} channelsMap
      * @param {Function} [directSender]
      */
-    addChannels: function(channelsMap, directSender) {
+    addChannels: function(bindingId, channelsMap, directSender) {
 
         var canForward = this.connection.comet.getSupportsForwardToClient();
 
@@ -303,9 +304,10 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     },
 
     /**
+     * @param {string} bindingId
      * @param {NeatComet.channels.ChannelsMap} channelsMap
      */
-    removeChannels: function(channelsMap) {
+    removeChannels: function(bindingId, channelsMap) {
 
         _.each(channelsMap, function(dummy, channel) {
 
@@ -358,8 +360,8 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         }, this);
 
         // Apply
-        this.addChannels(add, directSender);
-        this.removeChannels(remove);
+        this.addChannels(bindingId, add, directSender);
+        this.removeChannels(bindingId, remove);
     },
 
     /**

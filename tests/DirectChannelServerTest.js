@@ -44,7 +44,6 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
     directChannelServer.binding.composeJsFilter = function(sender, openedProfile) {
         test.equal(arguments.length, 2);
         test.ok(_.isFunction(sender));
-        test.ok(true); // Align test.expect()
         test.strictEqual(openedProfile, theOpenedProfile);
 
         // Remember to test further
@@ -60,11 +59,13 @@ function testOpenProfile(test, binding, bindingAppliedParams, testChannels) {
         requestParams: requestParams,
 
         /**
+         * @param {string} bindingId
          * @param {NeatComet.channels.ChannelsMap} channelsMap
          * @param {Function} [directSender]
          */
-        addChannels: function(channelsMap, directSender) {
-            test.equal(arguments.length, 2);
+        addChannels: function(bindingId, channelsMap, directSender) {
+            test.equal(arguments.length, 3);
+            test.equal(bindingId, 'theBinding');
             test.ok(_.isFunction(directSender));
             test.equal(ultimateChannelSender, directSender);
 
@@ -242,7 +243,7 @@ module.exports = {
             }
         );
 
-        test.expect(22);
+        test.expect(20);
         test.done();
     },
 
@@ -275,7 +276,7 @@ module.exports = {
             }
         );
 
-        test.expect(22);
+        test.expect(20);
         test.done();
     }
 };

@@ -185,7 +185,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         }
 
         // Serve channels. Allow forward, when supported
-        openedProfile.addChannels(filters.channels, pusher);
+        openedProfile.addChannels(this.binding.id, filters.channels, pusher);
     },
 
     /**

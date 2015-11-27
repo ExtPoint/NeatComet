@@ -16,7 +16,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         this.channelPrefix = this.binding.profileId + ':' + this.binding.id + ':';
     },
 
-    _iterateParams: function(result, params, restParams, sender, openedProfile, getChannelFn) {
+    _iterateParams: function(result, params, restParams, pusher, openedProfile, getChannelFn) {
 
         var newRest = null;
         var currentName = null;
@@ -49,7 +49,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
             var currentValues = params[currentName];
             for (var i in currentValues) if (Object.prototype.hasOwnProperty.call(currentValues, i)) {
                 params[currentName] = currentValues[i];
-                this._iterateParams(result, params, newRest, sender, openedProfile, getChannelFn);
+                this._iterateParams(result, params, newRest, pusher, openedProfile, getChannelFn);
             }
 
             // Quit recursion. Tail was already there
@@ -59,9 +59,9 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
             var filterAndSender;
 
             // Compose filter, if required
-            if (sender) {
-                filterAndSender = this.binding.composeJsFilter(sender, openedProfile);
-                result.hasJs = result.hasJs || (filterAndSender !== sender);
+            if (pusher) {
+                filterAndSender = this.binding.composeJsFilter(pusher, openedProfile);
+                result.hasJs = result.hasJs || (filterAndSender !== pusher);
             }
 
             // Or just list channels
@@ -75,12 +75,12 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
 
     /**
      * @param {Object.<string, (string[]|string[][])>} params
-     * @param {Function} [sender]
+     * @param {Function} [pusher]
      * @param {NeatComet.router.OpenedProfileServer} [openedProfile]
      * @returns {NeatComet.channels.FiltersList}
      * @private
      */
-    _getFilters: function(params, sender, openedProfile) {
+    _getFilters: function(params, pusher, openedProfile) {
 
         /** @type {NeatComet.channels.FiltersList} */
         var result = {
@@ -143,7 +143,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         }
 
         // Get
-        this._iterateParams(result, params, restParams, sender, openedProfile, getChannelFn);
+        this._iterateParams(result, params, restParams, pusher, openedProfile, getChannelFn);
 
         return result;
     },

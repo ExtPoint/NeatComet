@@ -199,18 +199,18 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
 
 
     /**
-     * @param {Function} sender
+     * @param {Function} pusher
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @returns {Function}
      */
-    composeJsFilter: function(sender, openedProfile) {
+    composeJsFilter: function(pusher, openedProfile) {
 
         var jsText = this.where;
         var modelFilter = null;
 
         // Skip, if no work
         if (!jsText && _.isEmpty(this.masterKeys)) {
-            return sender;
+            return pusher;
         }
 
         // Prepare filter
@@ -221,19 +221,19 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
             modelFilter = eval('(function(model) { return (' + jsText + ') })');
         }
 
-        return this._jsFilter.bind(this, sender, modelFilter, openedProfile);
+        return this._jsFilter.bind(this, pusher, modelFilter, openedProfile);
     },
 
     /**
      *
-     * @param {Function} sender
+     * @param {Function} pusher
      * @param {Function|null} jsFilter
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @param {string} channel
      * @param {Array} message
      * @private
      */
-    _jsFilter: function(sender, jsFilter, openedProfile, channel, message) {
+    _jsFilter: function(pusher, jsFilter, openedProfile, channel, message) {
 
         // Test against JS filter
         if (jsFilter !== null) {
@@ -267,7 +267,7 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
         }
 
         // Send
-        sender(channel, message);
+        pusher(channel, message);
     },
 
     /**

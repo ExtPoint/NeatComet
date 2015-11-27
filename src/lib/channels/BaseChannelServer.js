@@ -9,6 +9,12 @@
  */
 
 /**
+ * @typedef {object} NeatComet.channels.FiltersList
+ * @property {boolean} hasJs
+ * @property {NeatComet.channels.ChannelsMap} channels
+ */
+
+/**
  * @class NeatComet.channels.BaseChannelServer
  * @extends NeatComet.Object
  */

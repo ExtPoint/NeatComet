@@ -235,6 +235,11 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
      */
     _jsFilter: function(pusher, jsFilter, openedProfile, channel, message) {
 
+        if (openedProfile.profileId == null) {
+            NeatComet.Exception.warning('Receiving message to pass through the closed connection. Unsubscription fails, probably in Comet adapter.');
+            return;
+        }
+
         // Test against JS filter
         if (jsFilter !== null) {
 

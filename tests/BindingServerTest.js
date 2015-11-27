@@ -73,6 +73,7 @@ function testJsFilter(test, challenge, response) {
             test.mockFunction('sender'),
         // openedProfile: NeatComet.router.OpenedProfileServer
         {
+            profileId: 123,
             requestParams: {
                 'theRequestParam': 'theMatchingValue'
             }
@@ -206,6 +207,7 @@ module.exports = {
             mockSender,
             // openedProfile: NeatComet.router.OpenedProfileServer
             {
+                profileId: 123,
                 updateMasterValues: test.mockFunction('updateMasterValues',
                     ['theBinding', 'theId', { 'theMasterAttribute': 'theMasterValue' }]
                 )

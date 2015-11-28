@@ -3,6 +3,13 @@ var when = require('when');
 require('../src/server');
 
 
+function next(fn) {
+    return function (object, promise) {
+        promise.then(fn);
+    }
+}
+
+
 module.exports = {
 
     /**
@@ -56,6 +63,9 @@ module.exports = {
             comet: comet
         });
 
+        var chain = test.mockFunction('chain');
+        neatComet.debugChainHandler = chain;
+
 
         // Open profile
         externalDataLoader.mockStep(
@@ -97,23 +107,64 @@ module.exports = {
                     arguments: [
                         // requestParams
                         [['theProfile', 'theJunctionBinding',
-                            {'theMasterBinding.id': 'theMasterFirst', 'theJunctionBinding.detailId': [] }]]
+                            {'theMasterBinding.id': 'theMasterFirst' /* TODO: must be array */, 'theJunctionBinding.detailId': []}]]
                     ],
                     return: when.resolve([[]])
                 }
             );
             comet.subscribe.mockStep(
-                function(channelId, hubListener) {
+                function (channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
                     junctionBindingHubListener = hubListener;
                 }
             );
             comet.pushToClient.mockStep(
-                ['theConnection', '!theOpenedProfile:theMasterBinding', ['add', { id: 'theMasterFirst'}]]
+                ['theConnection', '!theOpenedProfile:theMasterBinding', ['add', {id: 'theMasterFirst'}]]
             );
-            masterBindingHubListener('theProfile:theMasterBinding:1', ['add', { id: 'theMasterFirst'}]);
+            chain.mockStep(
+                next(saveJunction)
+            );
+            masterBindingHubListener('theProfile:theMasterBinding:1', ['add', {id: 'theMasterFirst'}]);
+        });
 
 
+        function saveJunction() {
+
+            // Save junction record, while detail is already saved
+            externalDataLoader.mockStep(
+                {
+                    arguments: [
+                        // requestParams
+                        [['theProfile', 'theDetailBinding',
+                            {
+                                'theMasterBinding.id': ['theMasterFirst'],
+                                'theJunctionBinding.detailId': 'theDetailFirst'
+                            }]]
+                    ],
+                    return: when.resolve([[{'id': 'theDetailFirst'}]])
+                }
+            );
+            comet.subscribe.mockStep(
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
+                    detailBindingHubListener = hubListener;
+                }
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['add', { masterId: 'theMasterFirst', detailId: 'theDetailFirst' }]],
+                ['theConnection', '!theOpenedProfile:theDetailBinding',
+                    ['add', { id: 'theDetailFirst' }]]
+            );
+            chain.mockStep(
+                next(close)
+            );
+            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+                ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+        }
+
+
+        function close() {
             // Close profile on connection lose
             comet.unsubscribe.mockStep(
                 function(channelId, hubListener) {
@@ -123,11 +174,16 @@ module.exports = {
                 function(channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
                     test.equal(junctionBindingHubListener, hubListener);
+                },
+                function(channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
+                    test.equal(detailBindingHubListener, hubListener);
                 }
             );
             comet.serverEvents.onLostConnection('theConnection');
 
+
             test.done();
-        });
+        }
     }
 };

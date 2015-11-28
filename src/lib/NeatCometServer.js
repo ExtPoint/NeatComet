@@ -26,6 +26,9 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
     /** @type {NeatComet.router.RouteServer} */
     routeServer: null,
 
+    /** @type {Function} */
+    debugChainHandler: null,
+
     /**
      * @param {Object} options
      */

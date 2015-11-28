@@ -147,6 +147,9 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
         openedProfile.profileId = profileId;
         openedProfile.connection = this;
         openedProfile.requestParams = requestParams;
+        if (this.manager.debugChainHandler) {
+            openedProfile.debugChainHandler = this.manager.debugChainHandler.bind(this.manager, openedProfile);
+        }
         openedProfile.init();
 
         // Register

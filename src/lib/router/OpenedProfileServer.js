@@ -37,6 +37,9 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     /** @type {Object.<string, *>} Just a cache for XxxChannelServer */
     pushers: null,
 
+    /** @type {Function} */
+    debugChainHandler: null,
+
 
     constructor: function() {
         this._channelFilters = {};
@@ -534,8 +537,14 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
 
         // Load
-        dataLoader.load()
+        var promise = dataLoader.load()
             .then(_.bind(function(data) {
+
+                // then() is always postponed. Ensure the profile is still opened
+                if (this.profileId == null) {
+                    return;
+                }
+
                 _.each(data, function(collection, index) {
                     var listCommandBinding = dataLoader.associations[index];
 
@@ -546,6 +555,10 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                     }, this);
                 }, this);
             }, this));
+
+        if (this.debugChainHandler) {
+            this.debugChainHandler(promise);
+        }
     }
 
 });

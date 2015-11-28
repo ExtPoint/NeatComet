@@ -144,6 +144,17 @@ module.exports = {
         });
 
 
+        // Step
+        subscribe.mockStep(
+            ['theChannel', fn1]
+        );
+        unsubscribe.mockStep(
+        );
+        openedProfileServer.updateChannels('theBinding', {
+            'theChannel': fn1
+        }, fn1);
+
+
         test.done();
     }
 

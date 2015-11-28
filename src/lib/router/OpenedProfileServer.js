@@ -45,7 +45,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     },
 
     init: function() {
-        
+
         this.bindings = this.connection.manager.profileBindings[this.profileId];
 
         // Init master values
@@ -318,12 +318,14 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
      */
     removeChannels: function(bindingId, channelsMap) {
 
+        var channelFilters = this._channelFilters[bindingId];
+
         _.each(channelsMap, function(dummy, channel) {
 
-            var filterAndSender = channelsMap[channel];
+            var filterAndSender = channelFilters[channel];
 
             // Mark here
-            delete channelsMap[channel];
+            delete channelFilters[channel];
 
             // Disconnect from channel
             if (filterAndSender === true) {
@@ -363,8 +365,8 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         }, this);
 
         // Apply
-        this.addChannels(bindingId, add, directSender);
         this.removeChannels(bindingId, remove);
+        this.addChannels(bindingId, add, directSender);
     },
 
     /**

@@ -1,3 +1,4 @@
+// TODO: Make production-friendly
 global._ = require('underscore');
 
 require('./lib/serverBase');

@@ -99,6 +99,10 @@ class BindingServer extends Object {
             }
         }
 
+        if (isset($this->whereSql) && !isset($this->where)) {
+            throw new Exception('Misuse of where. When using language-specific load time "where" clause, the EXACTLY SAME JavaScript version must be in "where" param for the router.');
+        }
+
         $this->channel = BaseChannelServer::create($this->routeMode);
         $this->channel->comet = $this->comet;
         $this->channel->binding = $this;

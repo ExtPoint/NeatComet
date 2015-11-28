@@ -77,6 +77,10 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
 
         this.masterKeys = {};
 
+        if (this.whereSql !== null && this.where === null) {
+            throw new NeatComet.Exception('Misuse of where. When using language-specific load time "where" clause, the EXACTLY SAME JavaScript version must be in "where" param for the router.');
+        }
+
         this.channel = NeatComet.channels.BaseChannelServer.create(this.routeMode);
         this.channel.binding = this;
         this.channel.init();

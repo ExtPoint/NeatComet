@@ -181,7 +181,7 @@ module.exports = {
                 // batchParams
                 [
                     ['theProfile', 'theDetailBinding', {
-                        'theMasterBinding.theMasterAttribute': 'theMatchingValue'
+                        'theMasterBinding.theMasterAttribute': ['theMatchingValue']
                     }]
                 ]
             ],
@@ -256,7 +256,7 @@ module.exports = {
                             // batchParams
                             [
                                 ['theProfile', 'theDetailBinding', {
-                                    'theMasterBinding.theMasterAttribute': matchingValue
+                                    'theMasterBinding.theMasterAttribute': [matchingValue]
                                 }]
                             ]
                         ],
@@ -311,10 +311,10 @@ module.exports = {
                             // batchParams
                             [
                                 ['theProfile', 'theDetailBinding', {
-                                    'theMasterBinding.theMasterAttribute': matchingAddValue
+                                    'theMasterBinding.theMasterAttribute': [matchingAddValue]
                                 }],
                                 ['theProfile', 'theDetailBinding', {
-                                    'theMasterBinding.theMasterAttribute': matchingRemoveValue
+                                    'theMasterBinding.theMasterAttribute': [matchingRemoveValue]
                                 }]
                             ]
                         ],
@@ -374,7 +374,7 @@ module.exports = {
                             // batchParams
                             [
                                 ['theProfile', 'theDetailBinding', {
-                                    'theMasterBinding.theMasterAttribute': matchingAddValue
+                                    'theMasterBinding.theMasterAttribute': [matchingAddValue]
                                 }]
                             ]
                         ],
@@ -427,7 +427,7 @@ module.exports = {
                             // batchParams
                             [
                                 ['theProfile', 'theDetailBinding', {
-                                    'theMasterBinding.theMasterAttribute': matchingRemoveValue
+                                    'theMasterBinding.theMasterAttribute': [matchingRemoveValue]
                                 }]
                             ]
                         ],

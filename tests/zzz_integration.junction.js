@@ -106,8 +106,14 @@ module.exports = {
                 {
                     arguments: [
                         // requestParams
-                        [['theProfile', 'theJunctionBinding',
-                            {'theMasterBinding.id': 'theMasterFirst' /* TODO: must be array */, 'theJunctionBinding.detailId': []}]]
+                        [[
+                            'theProfile',
+                            'theJunctionBinding',
+                            {
+                                'theMasterBinding.id': ['theMasterFirst'],
+                                'theJunctionBinding.detailId': []
+                            }
+                        ]]
                     ],
                     return: when.resolve([[]])
                 }
@@ -135,11 +141,14 @@ module.exports = {
                 {
                     arguments: [
                         // requestParams
-                        [['theProfile', 'theDetailBinding',
+                        [[
+                            'theProfile',
+                            'theDetailBinding',
                             {
                                 'theMasterBinding.id': ['theMasterFirst'],
-                                'theJunctionBinding.detailId': 'theDetailFirst'
-                            }]]
+                                'theJunctionBinding.detailId': ['theDetailFirst']
+                            }
+                        ]]
                     ],
                     return: when.resolve([[{'id': 'theDetailFirst'}]])
                 }

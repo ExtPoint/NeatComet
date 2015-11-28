@@ -9,13 +9,6 @@ require('../src/lib/channels/BaseChannelServer');
  */
 function initSubject(definition) {
 
-    // Mock
-    NeatComet.channels.BaseChannelServer.create = function() {
-        return {
-            init: function() {}
-        };
-    };
-
     return new NeatComet.bindings.BindingServer({
         profileId: 'theProfile',
         id: 'theBinding',
@@ -83,7 +76,29 @@ function testJsFilter(test, challenge, response) {
     jsFilter('theChannel', challenge);
 }
 
+var originalBaseChannelServer_create = NeatComet.channels.BaseChannelServer.create;
+
 module.exports = {
+
+    setUp: function (callback) {
+
+        // Unsafe Mock
+        NeatComet.channels.BaseChannelServer.create = function() {
+            return {
+                init: function() {}
+            };
+        };
+
+        callback();
+    },
+
+    tearDown: function (callback) {
+
+        // clean up
+        NeatComet.channels.BaseChannelServer.create = originalBaseChannelServer_create;
+
+        callback();
+    },
 
     /**
      * @param {NodeUnit} test

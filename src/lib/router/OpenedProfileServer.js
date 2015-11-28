@@ -500,7 +500,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
             _.each(added, function(value, name) {
 
                 var paramName = bindingId + '.' + name;
-                reducedParams[paramName] = value;
+                reducedParams[paramName] = [value];
 
                 _.each(binding.masterKeys[name], function(detailBinding) {
 
@@ -518,7 +518,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
         _.each(removed, function(value, name) {
 
             var paramName = bindingId + '.' + name;
-            reducedParams[paramName] = value;
+            reducedParams[paramName] = [value];
 
             _.each(binding.masterKeys[name], function(detailBinding) {
 

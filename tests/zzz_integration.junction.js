@@ -166,6 +166,84 @@ module.exports = {
                     ['add', { id: 'theDetailFirst' }]]
             );
             chain.mockStep(
+                next(deleteJunction)
+            );
+            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+                ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+        }
+
+
+        function deleteJunction() {
+
+            // Save junction record, while detail is already saved
+            externalDataLoader.mockStep(
+                {
+                    arguments: [
+                        // requestParams
+                        [[
+                            'theProfile',
+                            'theDetailBinding',
+                            {
+                                'theMasterBinding.id': ['theMasterFirst'],
+                                'theJunctionBinding.detailId': ['theDetailFirst']
+                            }
+                        ]]
+                    ],
+                    return: when.resolve([[{ id: 'theDetailFirst' }]]) // TODO: do not load removed records. Generalize "remove" command instead, if possible
+                }
+            );
+            comet.unsubscribe.mockStep(
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
+                    detailBindingHubListener = hubListener;
+                }
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['remove', { masterId: 'theMasterFirst', detailId: 'theDetailFirst' }]],
+                ['theConnection', '!theOpenedProfile:theDetailBinding',
+                    ['remove', { id: 'theDetailFirst' }]]
+            );
+            chain.mockStep(
+                next(saveJunctionAgain)
+            );
+            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+                ['remove', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+        }
+
+
+        function saveJunctionAgain() {
+
+            // Save junction record, while detail is already saved
+            externalDataLoader.mockStep(
+                {
+                    arguments: [
+                        // requestParams
+                        [[
+                            'theProfile',
+                            'theDetailBinding',
+                            {
+                                'theMasterBinding.id': ['theMasterFirst'],
+                                'theJunctionBinding.detailId': ['theDetailFirst']
+                            }
+                        ]]
+                    ],
+                    return: when.resolve([[{'id': 'theDetailFirst'}]])
+                }
+            );
+            comet.subscribe.mockStep(
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
+                    detailBindingHubListener = hubListener;
+                }
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['add', { masterId: 'theMasterFirst', detailId: 'theDetailFirst' }]],
+                ['theConnection', '!theOpenedProfile:theDetailBinding',
+                    ['add', { id: 'theDetailFirst' }]]
+            );
+            chain.mockStep(
                 next(close)
             );
             junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',

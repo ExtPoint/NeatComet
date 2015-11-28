@@ -318,14 +318,12 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
      */
     removeChannels: function(bindingId, channelsMap) {
 
-        var channelFilters = this._channelFilters[bindingId];
-
         _.each(channelsMap, function(dummy, channel) {
 
-            var filterAndSender = channelFilters[channel];
+            var filterAndSender = channelsMap[channel];
 
             // Mark here
-            delete channelFilters[channel];
+            delete channelsMap[channel];
 
             // Disconnect from channel
             if (filterAndSender === true) {
@@ -352,14 +350,14 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
         // Add new
         _.each(channelsMap, function(filterAndSender, channel) {
-            if (!current[channel]) {
+            if (!current || current[channel] !== filterAndSender) {
                 add[channel] = filterAndSender;
             }
         }, this);
 
         // Remove absent
         _.each(current, function(filterAndSender, channel) {
-            if (!channelsMap[channel]) {
+            if (channelsMap[channel] !== filterAndSender) {
                 remove[channel] = filterAndSender;
             }
         }, this);

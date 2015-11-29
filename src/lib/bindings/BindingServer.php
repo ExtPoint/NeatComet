@@ -23,6 +23,12 @@ class BindingServer extends Object {
     /** @var \StdClass */
     public $definition;
 
+    /** @var string|string[] */
+    public $idField = 'id';
+
+    /** @var string */
+    public $idDelimiter = '-';
+
     /** @var \StdClass|null */
     public $match;
 

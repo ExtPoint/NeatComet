@@ -52,7 +52,8 @@ module.exports = {
                     'theJunctionBinding': {
                         "match": {
                             "masterId": "theMasterBinding.id"
-                        }
+                        },
+                        "idField": ['masterId', 'detailId']
                     },
                     'theDetailBinding': {
                         "match": {
@@ -245,14 +246,14 @@ module.exports = {
                     ['add', { id: 'theDetailFirst' }]]
             );
             chain.mockStep(
-                next(saveAnotherMaster)
+                next(saveSecondMaster)
             );
             junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
                 ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
         }
 
 
-        function saveAnotherMaster() {
+        function saveSecondMaster() {
 
             // Save master record
             externalDataLoader.mockStep(
@@ -292,9 +293,29 @@ module.exports = {
                 ['theConnection', '!theOpenedProfile:theMasterBinding', ['add', {id: 'theMasterSecond'}]]
             );
             chain.mockStep(
-                next(close)
+                next(saveJunctionSecondMasterToFirstDetail)
             );
             masterBindingHubListener('theProfile:theMasterBinding:1', ['add', {id: 'theMasterSecond'}]);
+        }
+
+
+        function saveJunctionSecondMasterToFirstDetail() {
+
+            // Save master record
+            externalDataLoader.mockStep(
+            );
+            comet.unsubscribe.mockStep(
+            );
+            comet.subscribe.mockStep(
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['add', {masterId: 'theMasterSecond', detailId: 'theDetailFirst'}]]
+            );
+            junctionSecondBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterSecond',
+                ['add', {masterId: 'theMasterSecond', detailId: 'theDetailFirst'}]);
+
+            close();
         }
 
 

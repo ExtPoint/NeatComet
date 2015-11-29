@@ -36,7 +36,8 @@ module.exports = {
             pushToClient: test.mockFunction('comet.pushToClient')
         };
         var masterBindingHubListener;
-        var junctionBindingHubListener;
+        var junctionFirstBindingHubListener;
+        var junctionSecondBindingHubListener;
         var detailBindingHubListener;
 
 
@@ -121,7 +122,7 @@ module.exports = {
             comet.subscribe.mockStep(
                 function (channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
-                    junctionBindingHubListener = hubListener;
+                    junctionFirstBindingHubListener = hubListener;
                 }
             );
             comet.pushToClient.mockStep(
@@ -168,7 +169,7 @@ module.exports = {
             chain.mockStep(
                 next(deleteJunction)
             );
-            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+            junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
                 ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
         }
 
@@ -195,7 +196,7 @@ module.exports = {
             comet.unsubscribe.mockStep(
                 function (channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
-                    detailBindingHubListener = hubListener;
+                    test.equal(detailBindingHubListener, hubListener);
                 }
             );
             comet.pushToClient.mockStep(
@@ -207,7 +208,7 @@ module.exports = {
             chain.mockStep(
                 next(saveJunctionAgain)
             );
-            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+            junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
                 ['remove', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
         }
 
@@ -244,10 +245,56 @@ module.exports = {
                     ['add', { id: 'theDetailFirst' }]]
             );
             chain.mockStep(
+                next(saveAnotherMaster)
+            );
+            junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+                ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+        }
+
+
+        function saveAnotherMaster() {
+
+            // Save master record
+            externalDataLoader.mockStep(
+                {
+                    arguments: [
+                        // requestParams
+                        [[
+                            'theProfile',
+                            'theJunctionBinding',
+                            {
+                                'theMasterBinding.id': [ 'theMasterSecond' ],
+                                'theJunctionBinding.detailId': [ 'theDetailFirst' ]
+                            }
+                        ]]
+                    ],
+                    return: when.resolve([[]])
+                }
+            );
+            comet.unsubscribe.mockStep(
+                function (channelId, hubListener) {
+                    // TODO: Eliminate re-subscription for unchanged channels
+                    test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
+                    test.equal(junctionFirstBindingHubListener, hubListener);
+                }
+            );
+            comet.subscribe.mockStep(
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
+                    junctionFirstBindingHubListener = hubListener;
+                },
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterSecond');
+                    junctionSecondBindingHubListener = hubListener;
+                }
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theMasterBinding', ['add', {id: 'theMasterSecond'}]]
+            );
+            chain.mockStep(
                 next(close)
             );
-            junctionBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
-                ['add', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+            masterBindingHubListener('theProfile:theMasterBinding:1', ['add', {id: 'theMasterSecond'}]);
         }
 
 
@@ -260,7 +307,11 @@ module.exports = {
                 },
                 function(channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterFirst');
-                    test.equal(junctionBindingHubListener, hubListener);
+                    test.equal(junctionFirstBindingHubListener, hubListener);
+                },
+                function(channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterSecond');
+                    test.equal(junctionSecondBindingHubListener, hubListener);
                 },
                 function(channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');

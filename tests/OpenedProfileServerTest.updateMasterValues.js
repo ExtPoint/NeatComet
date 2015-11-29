@@ -92,22 +92,9 @@ TestingKit.prototype = {
 
     runSimpleCascade: function(noCascade) {
 
-        var expectedParamsAfterUpdate = {
-            'theMasterBinding.theMasterAttribute': ['theMatchingValue']
-        };
-
         // Init
         this.useMasterDetailBindings();
         this.initOpenedProfile();
-
-
-        // Mock
-        this.detailChannelUpdateChannels.mockStep(
-            function(openedProfile) {
-                this.test.equal(arguments.length, 1);
-                this.test.deepEqual(openedProfile.requestParams, expectedParamsAfterUpdate);
-            }.bind(this)
-        );
 
 
         // Test
@@ -121,7 +108,9 @@ TestingKit.prototype = {
             // No cascade
             noCascade
         );
-        this.test.deepEqual(this.openedProfile.requestParams, expectedParamsAfterUpdate);
+        this.test.deepEqual(this.openedProfile.requestParams, {
+            'theMasterBinding.theMasterAttribute': ['theMatchingValue']
+        });
 
     }
 
@@ -197,6 +186,15 @@ module.exports = {
                 test.deepEqual(message, ['add', detailRecord]);
 
                 test.done();
+            }.bind(this)
+        );
+
+        attempt.detailChannelUpdateChannels.mockStep(
+            function(openedProfile) {
+                attempt.test.equal(arguments.length, 1);
+                attempt.test.deepEqual(openedProfile.requestParams, {
+                    'theMasterBinding.theMasterAttribute': ['theMatchingValue']
+                });
             }.bind(this)
         );
 

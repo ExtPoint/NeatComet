@@ -464,26 +464,8 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
         var channelsToUpdate = {};
 
-        // Simplified channels update, if no cascade
+        // Just stop, if no cascade
         if (noCascade) {
-
-            // Collect related binding channel processors
-            _.each(added, function(value, name) {
-                _.each(binding.masterKeys[name], function (detailBinding) {
-                    channelsToUpdate[detailBinding.id] = detailBinding.channel;
-                }, this);
-            });
-            _.each(removed, function(value, name) {
-                _.each(binding.masterKeys[name], function (detailBinding) {
-                    channelsToUpdate[detailBinding.id] = detailBinding.channel;
-                }, this);
-            });
-
-            // Update
-            _.each(channelsToUpdate, function(channel) {
-                channel.updateChannels(this);
-            }, this);
-
             return;
         }
 

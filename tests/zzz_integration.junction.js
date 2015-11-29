@@ -315,6 +315,24 @@ module.exports = {
             junctionSecondBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterSecond',
                 ['add', {masterId: 'theMasterSecond', detailId: 'theDetailFirst'}]);
 
+            deleteFirstJunctionAgain();
+        }
+
+
+        function deleteFirstJunctionAgain() {
+
+            // Save junction record, while detail is already saved
+            externalDataLoader.mockStep(
+            );
+            comet.unsubscribe.mockStep(
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['remove', { masterId: 'theMasterFirst', detailId: 'theDetailFirst' }]]
+            );
+            junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
+                ['remove', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
+
             close();
         }
 

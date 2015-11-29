@@ -328,10 +328,33 @@ module.exports = {
      */
     "test primitives": function(test) {
 
+        // Test default id
         var bindingServer = initSubject({
         });
-
         test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'abc');
+
+
+        // Test alternative scalar id
+        bindingServer = initSubject({
+            idField: 'x'
+        });
+        test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'def');
+
+
+        // Test composite id
+        bindingServer = initSubject({
+            idField: ['id', 'x']
+        });
+        test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'abc-def');
+
+
+        // Test alternative id delimiter
+        bindingServer = initSubject({
+            idField: ['id', 'x'],
+            idDelimiter: '!'
+        });
+        test.equal(bindingServer.getIdFromAttributes({ 'id': 'abc', 'x': 'def' }), 'abc!def');
+
 
         test.done();
     },

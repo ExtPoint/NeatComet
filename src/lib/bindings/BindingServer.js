@@ -27,6 +27,12 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {Object.<string, *>|null} */
     match: null,
 
+    /** @type {string|string[]} */
+    idField: 'id',
+
+    /** @type {string} */
+    idDelimiter: '-',
+
     /** @type {Object.<string, *>|null} */
     matchConst: null,
 
@@ -116,8 +122,37 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
      * @returns {string}
      */
     getIdFromAttributes: function(attributes) {
-        // TODO: allow override from config. Support composite keys
-        return attributes.id;
+
+        if (_.isString(this.idField)) {
+            if (!_.has(attributes, this.idField)) {
+                throw new NeatComet.Exception('"' + this.idField + '" id attribute is misconfigured for the binding ' +
+                    this.profileId + '.' + this.id + ' or data supplier is implemented wrong');
+            }
+            return attributes[this.idField];
+        }
+        else {
+            var result = '';
+            var flag = false;
+
+            _.each(this.idField, function(field) {
+
+                if (!_.has(attributes, field)) {
+                    throw new NeatComet.Exception('"' + field + '" attribute of composite id is not configured for the binding ' +
+                        this.profileId + '.' + this.id + ' or data supplier is implemented wrong');
+                }
+
+                if (flag) {
+                    result += this.idDelimiter;
+                }
+                else {
+                    flag = true;
+                }
+                result += attributes[field];
+
+            }, this);
+
+            return result;
+        }
     },
 
     /**

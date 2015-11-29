@@ -333,7 +333,46 @@ module.exports = {
             junctionFirstBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterFirst',
                 ['remove', {masterId: 'theMasterFirst', detailId: 'theDetailFirst'}]);
 
-            close();
+            deleteSecondJunction();
+        }
+
+
+        function deleteSecondJunction() {
+
+            // Save junction record, while detail is already saved
+            externalDataLoader.mockStep(
+                {
+                    arguments: [
+                        // requestParams
+                        [[
+                            'theProfile',
+                            'theDetailBinding',
+                            {
+                                'theMasterBinding.id': ['theMasterFirst', 'theMasterSecond'],
+                                'theJunctionBinding.detailId': ['theDetailFirst']
+                            }
+                        ]]
+                    ],
+                    return: when.resolve([[{ id: 'theDetailFirst' }]])
+                }
+            );
+            comet.unsubscribe.mockStep(
+                function (channelId, hubListener) {
+                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
+                    test.equal(detailBindingHubListener, hubListener);
+                }
+            );
+            comet.pushToClient.mockStep(
+                ['theConnection', '!theOpenedProfile:theJunctionBinding',
+                    ['remove', { masterId: 'theMasterSecond', detailId: 'theDetailFirst' }]],
+                ['theConnection', '!theOpenedProfile:theDetailBinding',
+                    ['remove', { id: 'theDetailFirst' }]]
+            );
+            chain.mockStep(
+                next(close)
+            );
+            junctionSecondBindingHubListener('theProfile:theJunctionBinding:masterId=theMasterSecond',
+                ['remove', {masterId: 'theMasterSecond', detailId: 'theDetailFirst'}]);
         }
 
 
@@ -351,10 +390,6 @@ module.exports = {
                 function(channelId, hubListener) {
                     test.equal(channelId, 'theProfile:theJunctionBinding:masterId=theMasterSecond');
                     test.equal(junctionSecondBindingHubListener, hubListener);
-                },
-                function(channelId, hubListener) {
-                    test.equal(channelId, 'theProfile:theDetailBinding:id=theDetailFirst');
-                    test.equal(detailBindingHubListener, hubListener);
                 }
             );
             comet.serverEvents.onLostConnection('theConnection');

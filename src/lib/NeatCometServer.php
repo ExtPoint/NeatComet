@@ -17,8 +17,8 @@ class NeatCometServer extends Object {
     /** @var IOrmLoader */
     public $ormLoader;
 
-    /** @var BindingServer[][] */
-    protected $profileBindings;
+    /** @var BindingServer[][] Read-only, if outside, please */
+    public $profileBindings;
 
     /** @var BindingServer[][] */
     protected $modelBindings;

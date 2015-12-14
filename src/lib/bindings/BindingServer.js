@@ -4,6 +4,8 @@
  * @license MIT
  */
 
+var when = require('when');
+
 /**
  * @class NeatComet.bindings.BindingServer
  * @extends NeatComet.Object
@@ -24,14 +26,14 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {Object.<string, *>} */
     definition: null,
 
-    /** @type {Object.<string, *>|null} */
-    match: null,
-
     /** @type {string|string[]} */
     idField: 'id',
 
     /** @type {string} */
     idDelimiter: '-',
+
+    /** @type {Object.<string, *>|null} */
+    match: null,
 
     /** @type {Object.<string, *>|null} */
     matchConst: null,
@@ -48,11 +50,20 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {string|null} */
     routeMode: null,
 
+    /** @var {string[]|null} */
+    attributes: null,
+
+    /** @var {string} */
+    serverModel: '',
+
     /** @type {Object.<string, *>|null} */
     client: null,
 
 
     /** Components **/
+
+    /** @type {NeatComet.api.IOrmLoader} */
+    ormLoader: null,
 
     /** @type {NeatComet.channels.BaseChannelServer} */
     channel: null,
@@ -60,8 +71,19 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {Object.<string, NeatComet.bindings.BindingServer[]>} */
     masterKeys: null,
 
+    /** @type {{}|null} */
+    attributesFilter: null,
 
     init: function() {
+
+        // Cache helpers
+        if (this.attributes !== null) {
+            var attributesFilter = {};
+            _.each(this.attributes, function(name, i) {
+                attributesFilter[name] = i;
+            });
+            this.attributesFilter = attributesFilter;
+        }
 
         // Expand definition
         _.assign(this, this.definition);
@@ -157,13 +179,60 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
 
     /**
      *
-     * @param {Object} params
+     * @param {Object} request
      * @returns {Promise}
      */
-    loadDataLocally: function(params) {
+    loadDataLocally: function(request) {
+        var match = this.match !== null ?
+            this.applyRequestToMatchObject(request) :
+            null;
 
-        // TODO: implement this
-        throw new NeatComet.Exception('Not implemented');
+        return when.resolve().then(function() {
+            if (this.whereSql !== null) {
+                return this.ormLoader.loadRecords(
+                    this.serverModel,
+                    match,
+                    NeatComet.api.IOrmLoader.WHERE_SQL,
+                    this.whereSql,
+                    request,
+                    this
+                );
+            }
+
+            if (this.where !== null) {
+                return this.ormLoader.loadRecords(
+                    this.serverModel,
+                    match,
+                    NeatComet.api.IOrmLoader.WHERE_JS,
+                    this.where,
+                    request,
+                    this
+                );
+            }
+
+            return this.ormLoader.loadRecords(
+                this.serverModel,
+                match,
+                NeatComet.api.IOrmLoader.WHERE_NONE,
+                null,
+                null,
+                this
+            );
+        }.bind(this)).then(function(data) {
+
+            // Filter loaded attributes
+            if (this.attributesFilter !== null) {
+                Jii._.each(data, function(item, i) {
+                    var filteredItem = {};
+                    Jii._.each(this.attributesFilter, function(key) {
+                        filteredItem[key] = item[key];
+                    }.bind(this));
+                    data[i] = filteredItem;
+                }.bind(this));
+            }
+
+            return data;
+        }.bind(this));
     },
 
     /**
@@ -371,6 +440,36 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
 
                 break;
         }
+    }
+
+}, /** @lends NeatComet.bindings.BindingServer */{
+
+    /**
+     * @param {string} where
+     * @return {string}
+     */
+    convertWhereJsToSql: function(where) {
+        return where
+            .replace(/&&/g, ' AND ')
+            .replace(/||/g, ' OR ')
+            .replace(/!=/g, ' <> ')
+            .replace(/!/g, ' NOT ')
+            .replace(/{(\w+)}/g, ':$1');
+    },
+
+    /**
+     * @param {string} sql
+     * @param {object} attributes
+     * @return {object}
+     */
+    filterAttributesBySqlParams: function(sql, attributes) {
+        var result = {};
+        var matches = sql.match(/:(\w+)/g) || [];
+
+        Jii._.each(matches, function(key) {
+            result[key] = attributes[key];
+        });
+        return result;
     }
 
 });

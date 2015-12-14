@@ -58,7 +58,7 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
             // Get binding
             var profileBindings = this.manager.profileBindings[profileId];
             if (!profileBindings) {
-                throw new NeatComet.Exception('Wrong profile requested');
+                throw new NeatComet.Exception('Wrong profile requested. Not found profile id `' + profileId + '`.');
             }
 
             // Track opened profile

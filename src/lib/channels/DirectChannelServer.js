@@ -241,6 +241,14 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
     },
 
     /**
+     * @param {string[]} attributes
+     * @return string
+     */
+    _getChannelByAttributes: function(attributes) {
+        return this._getChannel(this.binding.applyAttributesToMatchObject(attributes));
+    },
+
+    /**
      * @param {NeatComet.router.OpenedProfileServer} openedProfile
      * @param {Array} message
      */
@@ -251,6 +259,53 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
             '!' + openedProfile.id + ':' + this.binding.id,
             message
         );
+    },
+
+
+    sendAdd: function(attributeValues) {
+        var channel = this._getChannelByAttributes(attributeValues);
+
+        // Filter
+        if (this.binding.attributesFilter !== null) {
+            attributeValues = array_intersect_key(attributeValues, this.binding.attributesFilter);
+        }
+
+        // Send
+        this.push(channel, ["add", attributeValues]);
+    },
+
+    sendUpdate: function(updatedAttributeValues, oldAttributeValues) {
+
+        newChannel = this._getChannelByAttributes(updatedAttributeValues);
+        oldChannel = this._getChannelByAttributes(oldAttributeValues);
+
+        // Filter
+        if (this.binding.attributesFilter !== null) {
+            updatedAttributeValues = array_intersect_key(updatedAttributeValues, this.binding.attributesFilter);
+            oldAttributeValues = array_intersect_key(oldAttributeValues, this.binding.attributesFilter);
+        }
+
+        // Send
+        if (newChannel !== oldChannel) {
+            this.push(newChannel, ["add", updatedAttributeValues]);
+            this.push(oldChannel, ["remove", oldAttributeValues]);
+        }
+        else {
+            this.push(newChannel, ["update", updatedAttributeValues, oldAttributeValues]);
+        }
+    },
+
+    sendRemove: function(oldAttributeValues) {
+
+        channel = this._getChannelByAttributes(oldAttributeValues);
+
+        // Filter
+        if (this.binding.attributesFilter !== null) {
+            oldAttributeValues = array_intersect_key(oldAttributeValues, this.binding.attributesFilter);
+        }
+
+        // Send
+        this.push(channel, ["remove", oldAttributeValues]);
     }
 
 }, {

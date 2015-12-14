@@ -20,6 +20,9 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
     /** @type {NeatComet.api.ICometServer} */
     comet: null,
 
+    /** @type {NeatComet.api.ICometServer} */
+    ormLoader: null,
+
     /** @type {?function} */
     externalDataLoader: null,
 
@@ -34,6 +37,7 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
      */
     setup: function(options) {
 
+        this.ormLoader = options.ormLoader || null;
         this.externalDataLoader = options.externalDataLoader || null;
 
         this._setupBindings(options.config || /* legacy */ options.configFileName);
@@ -73,6 +77,7 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
             _.each(bindingDefinitions, function(definition, id) {
 
                 var binding = new NeatComet.bindings.BindingServer({
+                    ormLoader: this.ormLoader,
                     profileId: profileId,
                     id: id,
                     definition: definition

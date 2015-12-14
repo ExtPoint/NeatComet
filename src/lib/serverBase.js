@@ -5,6 +5,7 @@
 /** @namespace NeatComet.configReader */
 /** @namespace NeatComet.router */
 global.NeatComet = {
+    api: {},
     adapters: {},
     bindings: {},
     channels: {},

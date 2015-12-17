@@ -261,53 +261,64 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
         );
     },
 
-
     sendAdd: function(attributeValues) {
         var channel = this._getChannelByAttributes(attributeValues);
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            attributeValues = array_intersect_key(attributeValues, this.binding.attributesFilter);
+            attributeValues = self.arrayIntersectKey(attributeValues, this.binding.attributesFilter);
         }
 
         // Send
-        this.push(channel, ["add", attributeValues]);
+        this.binding.comet.broadcast(channel, ["add", attributeValues]);
     },
 
     sendUpdate: function(updatedAttributeValues, oldAttributeValues) {
 
-        newChannel = this._getChannelByAttributes(updatedAttributeValues);
-        oldChannel = this._getChannelByAttributes(oldAttributeValues);
+        var newChannel = this._getChannelByAttributes(updatedAttributeValues);
+        var oldChannel = this._getChannelByAttributes(oldAttributeValues);
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            updatedAttributeValues = array_intersect_key(updatedAttributeValues, this.binding.attributesFilter);
-            oldAttributeValues = array_intersect_key(oldAttributeValues, this.binding.attributesFilter);
+            updatedAttributeValues = self.arrayIntersectKey(updatedAttributeValues, this.binding.attributesFilter);
+            oldAttributeValues = self.arrayIntersectKey(oldAttributeValues, this.binding.attributesFilter);
         }
 
         // Send
         if (newChannel !== oldChannel) {
-            this.push(newChannel, ["add", updatedAttributeValues]);
-            this.push(oldChannel, ["remove", oldAttributeValues]);
+            this.binding.comet.broadcast(newChannel, ["add", updatedAttributeValues]);
+            this.binding.comet.broadcast(oldChannel, ["remove", oldAttributeValues]);
         }
         else {
-            this.push(newChannel, ["update", updatedAttributeValues, oldAttributeValues]);
+            this.binding.comet.broadcast(newChannel, ["update", updatedAttributeValues, oldAttributeValues]);
         }
     },
 
     sendRemove: function(oldAttributeValues) {
 
-        channel = this._getChannelByAttributes(oldAttributeValues);
+        var channel = this._getChannelByAttributes(oldAttributeValues);
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            oldAttributeValues = array_intersect_key(oldAttributeValues, this.binding.attributesFilter);
+            oldAttributeValues = self.arrayIntersectKey(oldAttributeValues, this.binding.attributesFilter);
         }
 
         // Send
-        this.push(channel, ["remove", oldAttributeValues]);
+        this.binding.comet.broadcast(channel, ["remove", oldAttributeValues]);
     }
 
 }, {
-    CONSTANT_CHANNEL: '1'
+
+    CONSTANT_CHANNEL: '1',
+
+    arrayIntersectKey: function(arr1, arr2) {
+        var result = {};
+        _.each(arr1, function(value, key) {
+            if (arr2.hasOwnProperty(key)) {
+                result[key] = value;
+            }
+        });
+        return result;
+    }
+
 });

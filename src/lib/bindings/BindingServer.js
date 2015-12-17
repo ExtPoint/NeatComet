@@ -65,6 +65,9 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {NeatComet.api.IOrmLoader} */
     ormLoader: null,
 
+    /** @type {NeatComet.api.ICometServer} */
+    comet: null,
+
     /** @type {NeatComet.channels.BaseChannelServer} */
     channel: null,
 

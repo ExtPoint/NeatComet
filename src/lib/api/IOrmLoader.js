@@ -18,7 +18,7 @@ NeatComet.api.IOrmLoader.WHERE_SQL = 'sql';
 NeatComet.api.IOrmLoader.prototype = {
 
     /**
-     * @param {string|Jii.sql.ActiveQuery} modelClass
+     * @param {string|function} modelClass
      * @param {object|null} match
      * @param {string} whereType
      * @param {string|null} where

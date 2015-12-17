@@ -32,29 +32,30 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
     /** @type {Function} */
     debugChainHandler: null,
 
+    /** @type BindingServer[][] */
+    _modelBindings: null,
+
     /**
      * @param {Object} options
      */
     setup: function(options) {
 
+        this.comet = options.comet;
         this.ormLoader = options.ormLoader || null;
         this.externalDataLoader = options.externalDataLoader || null;
 
         this._setupBindings(options.config || /* legacy */ options.configFileName);
-
-        this._setupComet(options.comet);
+        this._setupComet();
     },
 
-    _setupComet: function(comet) {
-
-        this.comet = comet;
+    _setupComet: function() {
 
         // May be absent in case of "Business logic source only"
         if (NeatComet.router) {
             this.routeServer = new NeatComet.router.RouteServer();
             this.routeServer.manager = this;
             this.routeServer.init();
-            comet.bindServerEvents(this.routeServer);
+            this.comet.bindServerEvents(this.routeServer);
         }
     },
 
@@ -71,6 +72,7 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
 
         // Apply settings
         this.profileBindings = {};
+        this.modelBindings = {};
 
         _.each(config, function(bindingDefinitions, profileId) {
 
@@ -78,15 +80,17 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
 
                 var binding = new NeatComet.bindings.BindingServer({
                     ormLoader: this.ormLoader,
+                    comet: this.comet,
                     profileId: profileId,
                     id: id,
                     definition: definition
                 });
 
-                if (!this.profileBindings[profileId]) {
-                    this.profileBindings[profileId] = {};
-                }
+                this.profileBindings[profileId] = this.profileBindings[profileId] || {};
                 this.profileBindings[profileId][id] = binding;
+
+                this.modelBindings[definition.serverModel] = this.modelBindings[definition.serverModel] || [];
+                this.modelBindings[definition.serverModel].push(binding);
 
             }, this);
 
@@ -100,6 +104,20 @@ var self = NeatComet.NeatCometServer = NeatComet.Object.extend(/** @lends NeatCo
             }, this);
         }, this);
 
+    },
+
+    broadcastEvent: function(modelClass, method) {
+
+        if (this.modelBindings[modelClass]) {
+
+            // Get passed args
+            var args = _.toArray(arguments).slice(2);
+
+            // Call each
+            _.each(this.modelBindings[modelClass], function(binding) {
+                binding.channel[method].apply(binding.channel, args);
+            });
+        }
     }
 
 }, {

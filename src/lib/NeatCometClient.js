@@ -19,6 +19,9 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
     /** @type {NeatComet.NeatCometClient~createCollection} */
     createCollection: null,
 
+    /** @type {NeatComet.NeatCometClient~callCollection} */
+    callCollection: null,
+
     /** @type {Object.<string, Object.<string, *>>} */
     profilesDefinition: null,
 
@@ -42,6 +45,7 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         this._openedProfileParams = [];
         this._openedProfiles = {};
         this._openedProfilesByProfileId = {};
+        this.callCollection = this.callCollection || this._callCollection.bind(this);
 
         // Setup channel
         this._connection = new NeatComet.router.ConnectionClient({
@@ -126,7 +130,8 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
                 _.each(this._openedProfilesByProfileId[profileId], function(openedProfile) {
 
                     // Init call
-                    openedProfile.getCollection(bindingId).reset(bindingId_data[1]);
+                    var collection = openedProfile.getCollection(bindingId);
+                    this.callCollection.call(null, collection, 'reset', bindingId_data[1]);
                 }, this);
 
             }, this);
@@ -141,14 +146,10 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
     },
 
     _callCollections: function(profileRef, bindingId, args) {
-
-        var command = args[0];
-        args = args.slice(1);
-
-        function callCollection(openedProfile) {
+        var callCollection = function (openedProfile) {
             var collection = openedProfile.getCollection(bindingId);
-            collection[command].apply(collection, args);
-        }
+            this.callCollection.apply(null, [collection].concat(args));
+        }.bind(this);
 
         if (profileRef.substr(0, 1) === '!') {
             callCollection(this._openedProfiles[profileRef.substr(1)]);
@@ -156,6 +157,17 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         else {
             _.each(this._openedProfilesByProfileId[profileRef], callCollection);
         }
+    },
+
+    /**
+     *
+     * @param {NeatComet.api.ICollectionClient} collection
+     * @param {string} method
+     * @param {...*} param1
+     * @protected
+     */
+    _callCollection: function(collection, method, param1) {
+        collection[method].apply(collection, _.toArray(arguments).slice(2));
     }
 
 });

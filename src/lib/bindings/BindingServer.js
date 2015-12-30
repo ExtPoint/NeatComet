@@ -113,6 +113,7 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
         }
 
         this.channel = NeatComet.channels.BaseChannelServer.create(this.routeMode);
+        this.channel.comet = this.comet;
         this.channel.binding = this;
         this.channel.init();
     },

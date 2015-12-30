@@ -8,6 +8,13 @@
  */
 
 /**
+ * @callback NeatComet.NeatCometClient~callCollection
+ * @param {NeatComet.api.ICollectionClient} collection
+ * @param {string} method
+ * @param {...*} param1
+ */
+
+/**
  * @class NeatComet.NeatCometClient
  * @extends NeatComet.Object
  */
@@ -160,7 +167,6 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
     },
 
     /**
-     *
      * @param {NeatComet.api.ICollectionClient} collection
      * @param {string} method
      * @param {...*} param1

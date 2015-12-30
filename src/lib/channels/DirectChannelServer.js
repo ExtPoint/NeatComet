@@ -266,7 +266,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            attributeValues = self.arrayIntersectKey(attributeValues, this.binding.attributesFilter);
+            attributeValues = self.hashIntersectKey(attributeValues, this.binding.attributesFilter);
         }
 
         // Send
@@ -280,8 +280,8 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            updatedAttributeValues = self.arrayIntersectKey(updatedAttributeValues, this.binding.attributesFilter);
-            oldAttributeValues = self.arrayIntersectKey(oldAttributeValues, this.binding.attributesFilter);
+            updatedAttributeValues = self.hashIntersectKey(updatedAttributeValues, this.binding.attributesFilter);
+            oldAttributeValues = self.hashIntersectKey(oldAttributeValues, this.binding.attributesFilter);
         }
 
         // Send
@@ -300,7 +300,7 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
 
         // Filter
         if (this.binding.attributesFilter !== null) {
-            oldAttributeValues = self.arrayIntersectKey(oldAttributeValues, this.binding.attributesFilter);
+            oldAttributeValues = self.hashIntersectKey(oldAttributeValues, this.binding.attributesFilter);
         }
 
         // Send
@@ -311,10 +311,10 @@ var self = NeatComet.channels.DirectChannelServer = NeatComet.channels.BaseChann
 
     CONSTANT_CHANNEL: '1',
 
-    arrayIntersectKey: function(arr1, arr2) {
+    hashIntersectKey: function(hash1, hash2) {
         var result = {};
-        _.each(arr1, function(value, key) {
-            if (arr2.hasOwnProperty(key)) {
+        _.each(hash1, function(value, key) {
+            if (_.has(hash2, key)) {
                 result[key] = value;
             }
         });

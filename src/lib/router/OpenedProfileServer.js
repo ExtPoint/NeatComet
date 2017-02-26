@@ -35,7 +35,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     _knownModels: null,
 
     /** @type {NeatComet.router.openedProfile.LimitsServer} */
-    _limits: null,
+    limits: null,
 
     /** @type {Object.<string, *>} Just a cache for XxxChannelServer */
     pushers: null,
@@ -47,7 +47,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     constructor: function() {
         this._channelFilters = {};
         this._knownModels = {};
-        this._limits = new NeatComet.router.openedProfile.LimitsServer();
+        this.limits = new NeatComet.router.openedProfile.LimitsServer();
         this.pushers = {};
     },
 
@@ -243,7 +243,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
             // Save limits range
             if (binding.limitParam) {
-                this._limits.extractAndUpdate(binding, this.requestParams, data[index]);
+                this.limits.extractAndUpdate(binding, this.requestParams, data[index]);
             }
 
             // Write data

@@ -51,13 +51,16 @@ function testApplyXxxToMatchObject(test, definition, applyRequestResult, applyAt
 
 /**
  * @param {NodeUnit} test
- * @param {Array} challenge
- * @param {?Array} response
+ * @param {Array} challengeAttributes
+ * @param {boolean|null} limitTestResult
+ * @param {Array} response
  */
-function testJsFilter(test, challenge, response) {
+function testJsFilter(test, challengeAttributes, limitTestResult, response) {
 
     var bindingServer = initSubject({
-        where: 'model.theAttribute >= {theRequestParam}'
+        where: 'model.theAttribute >= {theRequestParam}',
+        limitParam: limitTestResult !== null ? 'theLimitParam' : null
+        // does not affect // limitOrder: ['theAttribute', 'DESC']
     });
 
     var jsFilter = bindingServer.composeJsFilter(
@@ -69,11 +72,16 @@ function testJsFilter(test, challenge, response) {
             profileId: 123,
             requestParams: {
                 'theRequestParam': 'theMatchingValue'
+            },
+            limits: {
+                matchRecord: function () {
+                    return limitTestResult;
+                }
             }
         }
     );
 
-    jsFilter('theChannel', challenge);
+    jsFilter('theChannel', challengeAttributes);
 }
 
 var originalBaseChannelServer_create = NeatComet.channels.BaseChannelServer.create;
@@ -245,21 +253,25 @@ module.exports = {
         // Test various command split combinations
         testJsFilter(test,
             ["add", { 'theAttribute': 'theIrrelevantValue' }],
+            true,
             null
         );
 
         testJsFilter(test,
             ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 1 }],
+            true,
             ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 1 }]
         );
 
         testJsFilter(test,
             ["remove", { 'theAttribute': 'theIrrelevantValue' }],
+            true,
             null
         );
 
         testJsFilter(test,
             ["remove", { 'theAttribute': 'theMatchingValue' }],
+            true,
             ["remove", { 'theAttribute': 'theMatchingValue' }]
         );
 
@@ -268,6 +280,7 @@ module.exports = {
                 { 'theAttribute': 'theMatchingValue2', 'somePayload': 5 },
                 { 'theAttribute': 'theMatchingValue' }
             ],
+            true,
             ["update",
                 { 'theAttribute': 'theMatchingValue2', 'somePayload': 5 },
                 { 'theAttribute': 'theMatchingValue' }
@@ -279,6 +292,7 @@ module.exports = {
                 { 'theAttribute': 'theMatchingValue', 'somePayload': 2 },
                 { 'theAttribute': 'theIrrelevantValue' }
             ],
+            true,
             ["add", { 'theAttribute': 'theMatchingValue', 'somePayload': 2 }]
         );
 
@@ -287,6 +301,25 @@ module.exports = {
                 { 'theAttribute': 'theIrrelevantValue', 'somePayload': 3 },
                 { 'theAttribute': 'theMatchingValue' }
             ],
+            true,
+            ["remove", { 'theAttribute': 'theMatchingValue' }]
+        );
+
+        testJsFilter(test,
+            ["update",
+                { 'theAttribute': 'theIrrelevantValue', 'somePayload': 3 },
+                { 'theAttribute': 'theMatchingValue' }
+            ],
+            false, // Limit test does not match
+            null
+        );
+
+        testJsFilter(test,
+            ["update",
+                { 'theAttribute': 'theIrrelevantValue', 'somePayload': 3 },
+                { 'theAttribute': 'theMatchingValue' }
+            ],
+            null, // Binding with no limit
             ["remove", { 'theAttribute': 'theMatchingValue' }]
         );
 

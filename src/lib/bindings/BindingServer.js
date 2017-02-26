@@ -331,22 +331,34 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     composeJsFilter: function(pusher, openedProfile) {
 
         var jsText = this.where;
-        var modelFilter = null;
+        var jsFilter = null;
 
         // Skip, if no work
-        if (!jsText && _.isEmpty(this.masterKeys)) {
+        if (!jsText && _.isEmpty(this.masterKeys) && !this.limitParam) {
             return pusher;
         }
 
-        // Prepare filter
+        // Prepare where filter
         if (jsText) {
             jsText = jsText.replace(/{(\w+)}/g, function (dummy, name) {
                 return JSON.stringify(openedProfile.requestParams[name]);
             });
-            modelFilter = eval('(function(model) { return (' + jsText + ') })');
+            jsFilter = eval('(function(model) { return (' + jsText + ') })');
         }
 
-        return this._jsFilter.bind(this, pusher, modelFilter, openedProfile);
+        // Add filter for limit
+        if (this.limitParam !== null) {
+            jsFilter = this._composeJsLimitFilter(openedProfile, this, jsFilter);
+        }
+
+        return this._jsFilter.bind(this, pusher, jsFilter, openedProfile);
+    },
+
+    _composeJsLimitFilter: function (openedProfile, binding, jsWhereFilter) {
+        return function (attributes) {
+            return openedProfile.limits.matchRecord(binding, attributes)
+                && (jsWhereFilter === null || jsWhereFilter(attributes));
+        };
     },
 
     /**

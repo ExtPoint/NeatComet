@@ -89,6 +89,7 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         openedProfile.profileId = profileId;
         openedProfile.createCollection = this.createCollection || /* legacy */ this.getCollection;
         openedProfile.profileDefinition = this.profilesDefinition[profileId];
+        openedProfile.client = this;
         openedProfile.init();
         this._openedProfiles[openedProfileId] = openedProfile;
 
@@ -123,6 +124,43 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
             }
 
         }, this);
+    },
+
+    closeProfile: function(openedProfileId, profileId) {
+
+        // Clear references
+        this._openedProfileParams = _.filter(this._openedProfileParams, function (command) {
+            return command[0] !== openedProfileId;
+        });
+
+        delete this._openedProfiles[openedProfileId];
+
+        this._openedProfilesByProfileId[profileId] = _.filter(this._openedProfilesByProfileId[profileId], function (command) {
+            return command[0] !== openedProfileId;
+        });
+        if (!this._openedProfilesByProfileId[profileId].length) {
+            delete this._openedProfilesByProfileId[profileId];
+        }
+
+        // Close server side
+        this._connection.sendClose([openedProfileId]);
+    },
+
+    refreshProfile: function (openedProfileId, params) {
+
+        // Send partial refresh
+        this._connection.sendOpen(
+            _.filter(this._openedProfileParams, function (command) {
+                if (command[0] === openedProfileId) {
+
+                    // Update params
+                    command[2] = params;
+
+                    return true;
+                }
+                return false;
+            })
+        );
     },
 
     _onRefreshResponse: function(profileData) {

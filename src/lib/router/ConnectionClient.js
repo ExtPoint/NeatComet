@@ -80,6 +80,15 @@ NeatComet.router.ConnectionClient = NeatComet.Object.extend(/** @lends NeatComet
             this._messageQueue = [];
 
         }, this));
+    },
+
+    /**
+     * @param {string[]} ids
+     */
+    sendClose: function(ids) {
+
+        // Just forward to comet adapter
+        this.comet.sendClose(ids);
     }
 
 });

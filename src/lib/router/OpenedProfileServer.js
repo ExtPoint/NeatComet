@@ -83,7 +83,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
 
     },
 
-    open: function() {
+    _reload: function (subscribeBindingFn) {
 
         // Extracted for use in updateMasterValues tests
         this._initMasterKeysForLoad();
@@ -101,13 +101,24 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                 if (this.profileId) {
 
                     // Attach channels, before load data
-                    _.each(this.bindings, function(binding) {
-                        binding.channel.openProfile(this);
-                    }, this);
+                    _.each(this.bindings, subscribeBindingFn, this);
                 }
 
                 return result;
             }, this));
+    },
+
+    update: function (requestParams) {
+        this.requestParams = requestParams;
+        return this._reload(function(binding) {
+            binding.channel.updateChannels(this);
+        });
+    },
+
+    open: function() {
+        return this._reload(function(binding) {
+            binding.channel.openProfile(this);
+        });
     },
 
     /**

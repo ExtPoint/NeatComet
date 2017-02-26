@@ -25,6 +25,9 @@ NeatComet.router.OpenedProfileClient = NeatComet.Object.extend(/** @lends NeatCo
     /** @type {Object.<string, NeatComet.api.ICollectionClient>} */
     collections: null,
 
+    /** @type {NeatComet.NeatCometClient} */
+    client: null,
+
     init: function() {
         this.collections = {};
     },
@@ -47,6 +50,19 @@ NeatComet.router.OpenedProfileClient = NeatComet.Object.extend(/** @lends NeatCo
         }
 
         return this.collections[bindingId];
+    },
+
+    close: function () {
+        this.client.closeProfile(this.id, this.profileId);
+
+        // TODO: Dispose cyclic references, if possible
+        this.collections = null;
+
+        this.client = null;
+    },
+
+    updateParams: function (params) {
+        this.client.refreshProfile(this.id, params);
     },
 
     /**

@@ -61,9 +61,22 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
                 throw new NeatComet.Exception('Wrong profile requested. Not found profile id `' + profileId + '`.');
             }
 
-            // Track opened profile
-            var openedProfile = this._addOpenedProfile(openedProfileId, profileId, profileRequestParams);
-            var result = openedProfile.open();
+            var openedProfile;
+            var result;
+
+            // Refresh, if exists
+            if (this._openedProfiles[openedProfileId]) {
+                openedProfile = this._openedProfiles[openedProfileId];
+                if (openedProfile.profileId !== profileId) {
+                    throw new NeatComet.Exception('Profile ids mismatch');
+                }
+                result = openedProfile.update(profileRequestParams);
+            }
+            // Opened profile
+            else {
+                openedProfile = this._addOpenedProfile(openedProfileId, profileId, profileRequestParams);
+                result = openedProfile.open();
+            }
 
             if (result !== null) {
                 promises.push(result);

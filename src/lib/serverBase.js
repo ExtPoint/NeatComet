@@ -10,5 +10,7 @@ global.NeatComet = {
     bindings: {},
     channels: {},
     configReader: {},
-    router: {}
+    router: {
+        openedProfile: {}
+    }
 };

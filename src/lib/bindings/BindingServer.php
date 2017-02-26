@@ -47,6 +47,12 @@ class BindingServer extends Object {
     /** @var string|null */
     public $routeMode;
 
+    /** @var string|null */
+    public $limitParam;
+
+    /** @var string[]|null */
+    public $limitOrder;
+
     /** @var string[]|null */
     public $attributes;
 
@@ -146,6 +152,10 @@ class BindingServer extends Object {
             $this->applyRequestToMatchObject($request) :
             null;
 
+        $limit = ($this->limitParam !== null && isset($request[$this->limitParam])) ?
+            $request[$this->limitParam] :
+            null;
+
         if (isset($this->whereSql)) {
 
             $data = $this->ormLoader->loadRecords(
@@ -154,7 +164,8 @@ class BindingServer extends Object {
                 IOrmLoader::WHERE_SQL,
                 $this->whereSql,
                 $request,
-                $this
+                $this,
+                $limit
             );
         }
 
@@ -166,7 +177,8 @@ class BindingServer extends Object {
                 IOrmLoader::WHERE_JS,
                 $this->where,
                 $request,
-                $this
+                $this,
+                $limit
             );
         }
 
@@ -177,7 +189,8 @@ class BindingServer extends Object {
                 IOrmLoader::WHERE_NONE,
                 null,
                 null,
-                $this
+                $this,
+                $limit
             );
         }
 

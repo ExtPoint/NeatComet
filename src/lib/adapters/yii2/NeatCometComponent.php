@@ -67,10 +67,11 @@ class NeatCometComponent extends Object implements IOrmLoader {
      * @param string|null $where
      * @param string[] $attributes
      * @param BindingServer $binding
+     * @param int[]|int|null $limit
      * @returns array Array of records data
      * @throws Exception
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding) {
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit) {
 
         /** @var ActiveQuery $query */
         $query = $modelClass::find();
@@ -99,6 +100,18 @@ class NeatCometComponent extends Object implements IOrmLoader {
 
             default:
                 throw new Exception('Where type "' . $whereType . '" is not implemented');
+        }
+
+        // Apply limit
+        if ($limit !== null) {
+            if (is_array($limit)) {
+                $query->offset($limit[0])->limit($limit[1]);
+            }
+            else {
+                $query->limit($limit);
+            }
+
+            $query->orderBy([$binding->limitOrder[0] => $binding->limitOrder[1] === 'DESC' ? SORT_DESC : SORT_ASC]);
         }
 
         // Query via model implementation

@@ -34,6 +34,9 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     /** @type {Object.<string, Object.<string, Object.<string, boolean>>>} */
     _knownModels: null,
 
+    /** @type {NeatComet.router.openedProfile.LimitsServer} */
+    _limits: null,
+
     /** @type {Object.<string, *>} Just a cache for XxxChannelServer */
     pushers: null,
 
@@ -44,6 +47,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
     constructor: function() {
         this._channelFilters = {};
         this._knownModels = {};
+        this._limits = new NeatComet.router.openedProfile.LimitsServer();
         this.pushers = {};
     },
 
@@ -235,6 +239,11 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                         true // No cascade
                     );
                 }, this);
+            }
+
+            // Save limits range
+            if (binding.limitParam) {
+                this._limits.extractAndUpdate(binding, this.requestParams, data[index]);
             }
 
             // Write data
@@ -533,6 +542,7 @@ var self = NeatComet.router.OpenedProfileServer = NeatComet.Object.extend(/** @l
                     _.each(collection, function(record) {
 
                         // Push message
+                        // TODO: ensure this was filtered on query
                         listCommandBinding[1].channel.push(this, [listCommandBinding[0], record]);
                     }, this);
                 }, this);

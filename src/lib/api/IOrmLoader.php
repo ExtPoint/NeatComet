@@ -18,8 +18,9 @@ interface IOrmLoader {
      * @param string|null $where
      * @param array $attributes
      * @param BindingServer $binding
+     * @param int[]|int|null $limit
      * @returns array Array of records data
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding);
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit);
 
 }

@@ -2,6 +2,9 @@ require('./bootstrap');
 var when = require('when');
 require('../src/lib/router/OpenedProfileServer');
 
+// Stub
+NeatComet.router.openedProfile.LimitsServer = function () {};
+
 /**
  * @param {Object} requestParams
  * @param {Object} mockProfileBindings

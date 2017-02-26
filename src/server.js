@@ -15,5 +15,6 @@ require('./lib/router/RouteServer');
 require('./lib/router/ConnectionServer');
 require('./lib/router/DataLoaderServer');
 require('./lib/router/OpenedProfileServer');
+require('./lib/router/openedProfile/LimitsServer');
 
 module.exports = global.NeatComet;

@@ -50,6 +50,12 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
     /** @type {string|null} */
     routeMode: null,
 
+    /** @var {string|null} */
+    limitParam: null,
+
+    /** @var {string[]|null} */
+    limitOrder: null,
+
     /** @var {string[]|null} */
     attributes: null,
 
@@ -191,6 +197,10 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
             this.applyRequestToMatchObject(request) :
             null;
 
+        var limit = (this.limitParam !== null && request[this.limitParam] != null) ?
+            request[this.limitParam] :
+            null;
+
         return when.resolve().then(function() {
             if (this.whereSql !== null) {
                 return this.ormLoader.loadRecords(
@@ -199,7 +209,8 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
                     NeatComet.api.IOrmLoader.WHERE_SQL,
                     this.whereSql,
                     request,
-                    this
+                    this,
+                    limit
                 );
             }
 
@@ -210,7 +221,8 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
                     NeatComet.api.IOrmLoader.WHERE_JS,
                     this.where,
                     request,
-                    this
+                    this,
+                    limit
                 );
             }
 
@@ -220,7 +232,8 @@ var self = NeatComet.bindings.BindingServer = NeatComet.Object.extend(/** @lends
                 NeatComet.api.IOrmLoader.WHERE_NONE,
                 null,
                 null,
-                this
+                this,
+                limit
             );
         }.bind(this)).then(function(data) {
 

@@ -24,9 +24,10 @@ NeatComet.api.IOrmLoader.prototype = {
      * @param {string|null} where
      * @param {string[]} attributes
      * @param {NeatComet.bindings.BindingServer} binding
+     * @param {number[]|number|null} limit
      * @returns {Promise} Array of records data
      */
-    loadRecords: function(modelClass, match, whereType, where, attributes, binding) {
+    loadRecords: function(modelClass, match, whereType, where, attributes, binding, limit) {
     }
 
 };

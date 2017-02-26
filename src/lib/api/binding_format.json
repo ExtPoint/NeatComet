@@ -39,6 +39,11 @@
                 "channelTemplate": "ccc={category}",
 
 
+                // Pagination, optional
+                // Note: requestParamName could be a number limit or array [offset, limit]
+                "limitParam": "requestParamName",
+                "limitOrder": ["id", "DESC"], // Constant. Only single attribute supported. Don't affect client side
+
                 // Attributes subset, optional
                 "attributes": ["id", "category"],
 

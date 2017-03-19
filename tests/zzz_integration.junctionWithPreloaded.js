@@ -112,13 +112,13 @@ module.exports = {
                 {} // profileRequestParams
             ]
         ]).then(function(loadedData) {
-            test.deepEqual(loadedData, {
-                theProfile: [
+            test.deepEqual(loadedData, [
+                ['theOpenedProfile', [
                     ['theMasterBinding', [{ id: 'theMasterFirst' }, { id: 'theMasterSecond' }]],
                     ['theJunctionBinding', []],
                     ['theDetailBinding', []]
-                ]
-            });
+                ]]
+            ]);
 
             saveJunction();
         });

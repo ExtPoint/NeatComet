@@ -93,12 +93,12 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
     /**
      * @param {NeatComet.router.OpenedProfileServer[]} openedProfiles
      * @param {Array} data
-     * @returns {Object}
+     * @returns {Array}
      * @private
      */
     _formatInitResponse: function(openedProfiles, data) {
 
-        var result = {};
+        var result = [];
 
         _.each(openedProfiles,
 
@@ -108,20 +108,20 @@ var self = NeatComet.router.ConnectionServer = NeatComet.Object.extend(/** @lend
              */
             function(openedProfile, index) {
 
-                var profileId = openedProfile.profileId;
-                if (!result[profileId]) {
-                    result[profileId] = [];
-                }
+                var bindingResults = [];
 
                 _.each(data[index], function(bindingData, bindingId) {
 
                     // Client init command
-                    result[profileId].push([
+                    bindingResults.push([
                         bindingId,
                         bindingData
                     ]);
 
                 }, this);
+
+                // Client init command
+                result.push([openedProfile.id, bindingResults]);
             },
             this
         );

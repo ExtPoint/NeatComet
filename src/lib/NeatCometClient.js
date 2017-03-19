@@ -169,21 +169,19 @@ NeatComet.NeatCometClient = NeatComet.Object.extend(/** @lends NeatComet.NeatCom
         );
     },
 
-    _onRefreshResponse: function(profileData) {
+    _onRefreshResponse: function(profilesData) {
 
         // Setup enabled bindings
-        _.each(profileData, function(profileBindings, profileId) {
+        _.each(profilesData, function(openedProfileId_bindings) {
 
-            _.each(profileBindings, function(bindingId_data) {
+            var openedProfileId = openedProfileId_bindings[0];
+
+            _.each(openedProfileId_bindings[1], function(bindingId_data) {
 
                 var bindingId = bindingId_data[0];
-
-                _.each(this._openedProfilesByProfileId[profileId], function(openedProfile) {
-
-                    // Init call
-                    var collection = openedProfile.getCollection(bindingId);
-                    this.callCollection.call(null, collection, 'reset', bindingId_data[1]);
-                }, this);
+                // Init call
+                var collection = this._openedProfiles[openedProfileId].getCollection(bindingId);
+                this.callCollection.call(null, collection, 'reset', bindingId_data[1]);
 
             }, this);
 

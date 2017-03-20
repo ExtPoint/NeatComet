@@ -24,8 +24,9 @@ interface IOrmLoader {
      * @param array $attributes
      * @param BindingServer $binding
      * @param int[]|int|null $limit
+     * @param int [$totalCount]
      * @returns array Array of records data
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit);
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit, &$totalCount = null);
 
 }

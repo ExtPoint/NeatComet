@@ -76,7 +76,7 @@ class NeatCometComponent extends Object implements IOrmLoader {
      * @returns array Array of records data
      * @throws Exception
      */
-    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit) {
+    public function loadRecords($modelClass, $match, $whereType, $where, $attributes, $binding, $limit, &$totalCount = null) {
 
         /** @var ActiveQuery $query */
         $query = $modelClass::find();
@@ -95,7 +95,7 @@ class NeatCometComponent extends Object implements IOrmLoader {
 
             case IOrmLoader::WHERE_JS:
                 $where = BindingServer::convertWhereJsToSql($where);
-                // no break;
+            // no break;
 
             case IOrmLoader::WHERE_SQL:
                 $query
@@ -118,6 +118,10 @@ class NeatCometComponent extends Object implements IOrmLoader {
 
             $query->orderBy([$binding->limitOrder[0] => $binding->limitOrder[1] === 'DESC' ? SORT_DESC : SORT_ASC]);
         }
+
+        // Fetch query total count as in ActiveDataProvider Yii2
+        $countQuery = clone $query;
+        $totalCount = (int) $countQuery->limit(-1)->offset(-1)->orderBy([])->count('*', $modelClass::getDb());
 
         // Query via model implementation
         if (
@@ -152,7 +156,7 @@ class NeatCometComponent extends Object implements IOrmLoader {
         if ($insert) {
 
             $this->server->broadcastEvent(
-                // Route
+            // Route
                 get_class($model), 'sendAdd',
                 // Params
                 $model->attributes
@@ -161,7 +165,7 @@ class NeatCometComponent extends Object implements IOrmLoader {
         else {
 
             $this->server->broadcastEvent(
-                // Route
+            // Route
                 get_class($model), 'sendUpdate',
                 // Params
                 $model->attributes, $changedAttributes + $model->oldAttributes
@@ -179,7 +183,7 @@ class NeatCometComponent extends Object implements IOrmLoader {
         }
 
         $this->server->broadcastEvent(
-            // Route
+        // Route
             get_class($model), 'sendRemove',
             // Params
             $model->attributes

@@ -149,9 +149,10 @@ class BindingServer extends Object {
 
     /**
      * @param array $request
+     * @param int [$totalCount]
      * @return array|null
      */
-    public function loadDataLocally($request) {
+    public function loadDataLocally($request, &$totalCount = null) {
 
         $match = isset($this->match) ?
             $this->applyRequestToMatchObject($request) :
@@ -170,7 +171,8 @@ class BindingServer extends Object {
                 $this->whereSql,
                 $request,
                 $this,
-                $limit
+                $limit,
+                $totalCount
             );
         }
 
@@ -183,7 +185,8 @@ class BindingServer extends Object {
                 $this->where,
                 $request,
                 $this,
-                $limit
+                $limit,
+                $totalCount
             );
         }
 
@@ -195,8 +198,13 @@ class BindingServer extends Object {
                 null,
                 null,
                 $this,
-                $limit
+                $limit,
+                $totalCount
             );
+        }
+
+        if ($totalCount === null) {
+            $totalCount = count($data);
         }
 
         // Filter loaded attributes
